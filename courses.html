@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DART — Survival Training & Disaster Courses</title>
+
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --font-clash: 'Clash Display', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-playfair: 'Playfair Display', Georgia, serif;
+      --text-black: #0c0d0d;
+      --subtext-black: #2a2c2b;
+      --glass-surface: rgba(255, 255, 255, 0.42);
+      --glass-border: rgba(255, 255, 255, 0.8);
+      --glass-highlight: rgba(255, 255, 255, 0.95);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body, html {
+      min-height: 100vh;
+      font-family: var(--font-clash);
+      color: var(--text-black);
+      background-color: #f6f8f5;
+      overflow-x: hidden;
+      scroll-behavior: smooth;
+    }
+
+    /* Diffused Atmospheric Blurred Backdrop */
+    .bg-layer {
+      position: fixed;
+      inset: -5%;
+      background: url('wallpaper.png') no-repeat center bottom;
+      background-size: cover;
+      transform: scale(1.04);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .bg-tint {
+      position: fixed;
+      inset: 0;
+      background: rgba(246, 248, 245, 0.08);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* Fixed Glass Header */
+    .top-bar {
+      position: sticky;
+      top: 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 3rem 4.5rem;
+      z-index: 30;
+      backdrop-filter: blur(20px) saturate(180%);
+      -webkit-backdrop-filter: blur(20px) saturate(180%);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.7);
+    }
+
+    .brand {
+      display: flex;
+      flex-direction: column;
+      text-decoration: none;
+      color: var(--text-black);
+    }
+
+    .brand-title {
+      font-size: 1.35rem;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+      line-height: 1;
+    }
+
+    .brand-sub {
+      font-family: var(--font-playfair);
+      font-style: italic;
+      font-size: 0.82rem;
+      color: var(--subtext-black);
+      letter-spacing: 0.04em;
+      margin-top: 3px;
+    }
+
+    .menu-toggle {
+      background: none;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      font-family: var(--font-clash);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--text-black);
+      padding: 8px 12px;
+      transition: opacity 0.3s ease, transform 0.2s ease;
+    }
+
+    .menu-toggle:hover {
+      opacity: 0.7;
+      transform: translateY(-1px);
+    }
+
+    .menu-bars {
+      width: 24px;
+      height: 12px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .menu-bars span {
+      display: block;
+      width: 100%;
+      height: 1.8px;
+      background: var(--text-black);
+      border-radius: 2px;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* Page Container */
+    .courses-wrapper {
+      position: relative;
+      z-index: 2;
+      max-width: 1380px;
+      margin: 0 auto;
+      padding: 4rem 4.5rem 7rem;
+    }
+
+    /* Course Heading Section */
+    .catalog-header {
+      margin-bottom: 3.5rem;
+      max-width: 860px;
+    }
+
+    .eyebrow {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      opacity: 0.7;
+    }
+
+    .catalog-title {
+      font-family: var(--font-playfair);
+      font-size: clamp(2.8rem, 5.5vw, 4.6rem);
+      font-weight: 400;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
+      margin-bottom: 1.4rem;
+    }
+
+    .catalog-title em {
+      font-style: italic;
+      font-weight: 300;
+    }
+
+    .catalog-description {
+      font-size: 1.1rem;
+      line-height: 1.6;
+      color: var(--subtext-black);
+      opacity: 0.85;
+      max-width: 640px;
+    }
+
+    /* Filter Controls */
+    .filter-bar {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-bottom: 3rem;
+      padding: 0.4rem;
+      width: fit-content;
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.8);
+      border-radius: 999px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+    }
+
+    .filter-btn {
+      border: none;
+      background: transparent;
+      padding: 0.6rem 1.4rem;
+      font-family: var(--font-clash);
+      font-size: 0.82rem;
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      color: var(--subtext-black);
+      border-radius: 999px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+
+    .filter-btn.active, .filter-btn:hover {
+      background: rgba(255, 255, 255, 0.88);
+      color: var(--text-black);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Frosted Glass Course Grid */
+    .course-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      gap: 2.2rem;
+    }
+
+    /* Liquid Frosted Course Card */
+    .course-card {
+      position: relative;
+      background: radial-gradient(
+        130% 90% at 0% 0%,
+        rgba(255, 255, 255, 0.72) 0%,
+        rgba(255, 255, 255, 0.35) 50%,
+        rgba(255, 255, 255, 0.16) 100%
+      );
+      backdrop-filter: blur(28px) saturate(190%) contrast(102%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(102%);
+      border: 1px solid var(--glass-border);
+      border-radius: 30px;
+      padding: 2.3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      min-height: 480px;
+      box-shadow: 
+        inset 1px 1px 2px var(--glass-highlight),
+        inset -1px -1px 2px rgba(255, 255, 255, 0.35),
+        0 18px 36px rgba(0, 0, 0, 0.04);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.4s ease;
+      cursor: pointer;
+    }
+
+    .course-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 
+        inset 1px 1px 2px #fff,
+        0 24px 44px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .card-pill {
+      font-size: 0.72rem;
+      font-weight: 600;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      background: rgba(255, 255, 255, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9);
+    }
+
+    .course-id {
+      font-size: 0.8rem;
+      opacity: 0.45;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .card-body {
+      margin-bottom: 2rem;
+    }
+
+    .course-title {
+      font-family: var(--font-playfair);
+      font-size: 2.1rem;
+      line-height: 1.15;
+      margin-bottom: 0.85rem;
+      letter-spacing: -0.015em;
+    }
+
+    .course-title span {
+      font-style: italic;
+      font-weight: 300;
+      display: block;
+    }
+
+    .course-summary {
+      font-size: 0.92rem;
+      line-height: 1.6;
+      color: var(--subtext-black);
+      opacity: 0.85;
+      margin-bottom: 1.4rem;
+    }
+
+    .modules-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.55rem;
+      font-size: 0.82rem;
+      color: var(--subtext-black);
+    }
+
+    .modules-list li {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    .modules-list li::before {
+      content: "";
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: var(--text-black);
+      opacity: 0.5;
+    }
+
+    .card-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 1.4rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.6);
+    }
+
+    .course-specs {
+      display: flex;
+      gap: 1.2rem;
+      font-size: 0.78rem;
+      font-weight: 500;
+      color: var(--subtext-black);
+      opacity: 0.7;
+    }
+
+    .btn-action {
+      font-size: 0.82rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-black);
+      transition: gap 0.25s ease;
+    }
+
+    .course-card:hover .btn-action {
+      gap: 0.75rem;
+    }
+
+    /* Liquid Glass Sidebar */
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 13, 13, 0.12);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 40;
+    }
+
+    .sidebar-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .liquid-sidebar {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      bottom: 16px;
+      width: 400px;
+      max-width: calc(100vw - 32px);
+      border-radius: 36px;
+      z-index: 50;
+      background: radial-gradient(
+        130% 100% at 100% 0%,
+        rgba(255, 255, 255, 0.65) 0%,
+        rgba(255, 255, 255, 0.28) 45%,
+        rgba(255, 255, 255, 0.12) 100%
+      );
+      backdrop-filter: blur(28px) saturate(190%) contrast(105%);
+      -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(105%);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      box-shadow: 
+        inset 1px 1px 2px rgba(255, 255, 255, 0.9),
+        0 20px 40px rgba(0, 0, 0, 0.08);
+      transform: translateX(calc(100% + 30px));
+      transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      flex-direction: column;
+      padding: 3rem 2.8rem;
+    }
+
+    .liquid-sidebar.active {
+      transform: translateX(0);
+    }
+
+    .close-btn {
+      align-self: flex-end;
+      background: rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.85);
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: var(--text-black);
+      transition: all 0.3s ease;
+    }
+
+    .close-btn:hover {
+      background: rgba(255, 255, 255, 0.8);
+      transform: scale(1.05);
+    }
+
+    .nav-links {
+      margin-top: 3.5rem;
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.8rem;
+    }
+
+    .nav-links a {
+      text-decoration: none;
+      font-family: var(--font-playfair);
+      font-size: 2.1rem;
+      font-weight: 400;
+      color: var(--text-black);
+      display: inline-block;
+      transition: transform 0.3s ease, letter-spacing 0.3s ease;
+    }
+
+    .nav-links a:hover {
+      transform: translateX(8px);
+      letter-spacing: 0.02em;
+    }
+
+    .nav-links span {
+      font-family: var(--font-clash);
+      font-size: 0.75rem;
+      font-weight: 600;
+      margin-right: 0.8rem;
+      opacity: 0.4;
+      vertical-align: middle;
+    }
+
+    @media (max-width: 768px) {
+      .top-bar {
+        padding: 1.4rem 1.6rem;
+      }
+      .courses-wrapper {
+        padding: 2.5rem 1.5rem;
+      }
+      .course-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Ambient Backdrop -->
+  <div class="bg-layer"></div>
+  <div class="bg-tint"></div>
+
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="overlay"></div>
+
+  <!-- Sidebar Menu -->
+  <aside class="liquid-sidebar" id="sidebar" aria-hidden="true">
+    <button class="close-btn" id="closeBtn" aria-label="Close Menu">&times;</button>
+    <ul class="nav-links">
+      <li><a href="index.html"><span>01</span>Home</a></li>
+      <li><a href="courses.html"><span>02</span>Courses</a></li>
+      <li><a href="#"><span>03</span>News</a></li>
+      <li><a href="#"><span>04</span>Software</a></li>
+      <li><a href="#"><span>05</span>Contact</a></li>
+    </ul>
+  </aside>
+
+  <!-- Top Navigation -->
+  <header class="top-bar">
+    <a href="#" class="brand">
+      <span class="brand-title">DART</span>
+      <span class="brand-sub">Curriculum & Survival Guides</span>
+    </a>
+
+    <button class="menu-toggle" id="openBtn" aria-label="Open Navigation">
+      <span>Index</span>
+      <div class="menu-bars">
+        <span></span>
+        <span></span>
+      </div>
+    </button>
+  </header>
+
+  <!-- Main Course Catalog -->
+  <main class="courses-wrapper">
+    <section class="catalog-header">
+      <span class="eyebrow">Tactical Readiness Catalog</span>
+      <h1 class="catalog-title">Disaster Survival <em>Curriculum</em></h1>
+      <p class="catalog-description">
+        Systematic training modules structured for severe environment survival, infrastructure collapse, and emergency response.
+      </p>
+    </section>
+
+    <!-- Filters -->
+    <nav class="filter-bar" aria-label="Disaster types">
+      <button class="filter-btn active" data-filter="all">All Disciplines</button>
+      <button class="filter-btn" data-filter="earthquake">Earthquakes</button>
+      <button class="filter-btn" data-filter="wildfire">Wildfires</button>
+      <button class="filter-btn" data-filter="flood">Floods</button>
+      <button class="filter-btn" data-filter="cyclone">Cyclones & Storms</button>
+      <button class="filter-btn" data-filter="winter">Winter Extremes</button>
+    </nav>
+
+    <!-- Course Cards -->
+    <div class="course-grid">
+
+      <!-- Course 1 -->
+      <article class="course-card" data-category="earthquake">
+        <div>
+          <header class="card-head">
+            <span class="card-pill">Structural Safety</span>
+            <span class="course-id">EQ-101</span>
+          </header>
+          <div class="card-body">
+            <h2 class="course-title">Earthquake <span>Survival & Recovery</span></h2>
+            <p class="course-summary">Core tactical guide for handling major tectonic shocks, identifying building load safe zones, and post-shake hazard clearing.</p>
+            <ul class="modules-list">
+              <li>Drop, Cover, and Hold On mechanics in high-rises</li>
+              <li>Safe isolation of domestic gas and electrical mains</li>
+              <li>Emergency evacuation bag preparation</li>
+            </ul>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <div class="course-specs">
+            <span>4 Lessons</span>
+            <span>&bull;</span>
+            <span>45 min</span>
+          </div>
+          <span class="btn-action">Start Guide &rarr;</span>
+        </footer>
+      </article>
+
+      <!-- Course 2 -->
+      <article class="course-card" data-category="wildfire">
+        <div>
+          <header class="card-head">
+            <span class="card-pill">Fire Defense</span>
+            <span class="course-id">WF-204</span>
+          </div>
+          <div class="card-body">
+            <h2 class="course-title">Wildfire & Brush <span>Evacuation Dynamics</span></h2>
+            <p class="course-summary">Protocol for situational awareness, wind-pattern analysis, smoke barrier respiration, and defensible space establishment.</p>
+            <ul class="modules-list">
+              <li>Reading perimeter spread and wind changes</li>
+              <li>Indoor particulate filtering without power</li>
+              <li>Vehicle bug-out safety in zero-visibility conditions</li>
+            </ul>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <div class="course-specs">
+            <span>6 Lessons</span>
+            <span>&bull;</span>
+            <span>1 hr 20 min</span>
+          </div>
+          <span class="btn-action">Start Guide &rarr;</span>
+        </footer>
+      </article>
+
+      <!-- Course 3 -->
+      <article class="course-card" data-category="flood">
+        <div>
+          <header class="card-head">
+            <span class="card-pill">Hydrology</span>
+            <span class="course-id">FL-302</span>
+          </div>
+          <div class="card-body">
+            <h2 class="course-title">Flash Flood & <span>High Water Response</span></h2>
+            <p class="course-summary">Procedures for rapid urban inundation, swift-water avoidance, secondary contamination hazards, and safe vertical relocation.</p>
+            <ul class="modules-list">
+              <li>Submerged car door pressure mechanics</li>
+              <li>Water sterilization and pathogen prevention</li>
+              <li>Emergency flotation improvisation</li>
+            </ul>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <div class="course-specs">
+            <span>5 Lessons</span>
+            <span>&bull;</span>
+            <span>1 hr</span>
+          </div>
+          <span class="btn-action">Start Guide &rarr;</span>
+        </footer>
+      </article>
+
+      <!-- Course 4 -->
+      <article class="course-card" data-category="cyclone">
+        <div>
+          <header class="card-head">
+            <span class="card-pill">Atmospheric</span>
+            <span class="course-id">CY-401</span>
+          </div>
+          <div class="card-body">
+            <h2 class="course-title">Cyclones & <span>Severe Wind Storms</span></h2>
+            <p class="course-summary">Reinforcement of vulnerable residential structures, shelter room selection, and navigating calm intervals within the eye.</p>
+            <ul class="modules-list">
+              <li>Window reinforcement and pressure stabilization</li>
+              <li>Managing debris impacts and roof breaches</li>
+              <li>Emergency lighting and offline battery preservation</li>
+            </ul>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <div class="course-specs">
+            <span>4 Lessons</span>
+            <span>&bull;</span>
+            <span>50 min</span>
+          </div>
+          <span class="btn-action">Start Guide &rarr;</span>
+        </footer>
+      </article>
+
+      <!-- Course 5 -->
+      <article class="course-card" data-category="winter">
+        <div>
+          <header class="card-head">
+            <span class="card-pill">Cryo Safety</span>
+            <span class="course-id">WZ-505</span>
+          </div>
+          <div class="card-body">
+            <h2 class="course-title">Severe Blizzards & <span>Freezing Grid Failure</span></h2>
+            <p class="course-summary">Preserving internal body core temperature, preventing frozen pipes, and mitigating carbon monoxide risks during prolonged blackouts.</p>
+            <ul class="modules-list">
+              <li>Setting up an insulated single-room living zone</li>
+              <li>Passive calorie-efficient warming strategies</li>
+              <li>Ventilation rules for emergency heaters</li>
+            </ul>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <div class="course-specs">
+            <span>5 Lessons</span>
+            <span>&bull;</span>
+            <span>1 hr 10 min</span>
+          </div>
+          <span class="btn-action">Start Guide &rarr;</span>
+        </footer>
+      </article>
+
+      <!-- Course 6 -->
+      <article class="course-card" data-category="earthquake">
+        <div>
+          <header class="card-head">
+            <span class="card-pill">Urban Survival</span>
+            <span class="course-id">UR-601</span>
+          </div>
+          <div class="card-body">
+            <h2 class="course-title">Post-Disaster <span>Resource Management</span></h2>
+            <p class="course-summary">Logistics planning for water conservation, non-perishable rationing, field waste sanitation, and neighborhood safety patrols.</p>
+            <ul class="modules-list">
+              <li>Daily water rationing calculations per person</li>
+              <li>Safe off-grid cooking and fire safety</li>
+              <li>Offline maps and analogue navigation</li>
+            </ul>
+          </div>
+        </div>
+        <footer class="card-footer">
+          <div class="course-specs">
+            <span>3 Lessons</span>
+            <span>&bull;</span>
+            <span>40 min</span>
+          </div>
+          <span class="btn-action">Start Guide &rarr;</span>
+        </footer>
+      </article>
+
+    </div>
+  </main>
+
+  <script>
+    // Sidebar Controls
+    const openBtn = document.getElementById('openBtn');
+    const closeBtn = document.getElementById('closeBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    function openSidebar() {
+      sidebar.classList.add('active');
+      overlay.classList.add('active');
+      sidebar.setAttribute('aria-hidden', 'false');
+    }
+
+    function closeSidebar() {
+      sidebar.classList.remove('active');
+      overlay.classList.remove('active');
+      sidebar.setAttribute('aria-hidden', 'true');
+    }
+
+    openBtn.addEventListener('click', openSidebar);
+    closeBtn.addEventListener('click', closeSidebar);
+    overlay.addEventListener('click', closeSidebar);
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && sidebar.classList.contains('active')) {
+        closeSidebar();
+      }
+    });
+
+    // Course Category Filter
+    const filterBtns = document.querySelectorAll('.filter-btn');
+    const courseCards = document.querySelectorAll('.course-card');
+
+    filterBtns.forEach((btn) => {
+      btn.addEventListener('click', () => {
+        filterBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        const filter = btn.getAttribute('data-filter');
+
+        courseCards.forEach(card => {
+          if (filter === 'all' || card.getAttribute('data-category') === filter) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>
