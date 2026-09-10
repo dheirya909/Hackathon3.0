@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kinetic Hero & Liquid Glass Experience</title>
+
+  <!-- Typography: Clash Display & Playfair Display -->
+  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,600,700&display=swap" rel="stylesheet" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet" />
+
+  <!-- GSAP & CustomEase CDN -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/CustomEase.min.js"></script>
+
+  <style>
+    :root {
+      --color-primary: #121212;
+      --color-dark: #070a09;
+      --text-black: #050505;
+      --text-muted: #2a2d2c;
+      --font-heading: 'Clash Display', sans-serif;
+      --font-subtext: 'Playfair Display', serif;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      background-color: #f6f8f7;
+      color: var(--text-black);
+      overflow-x: hidden;
+      font-family: var(--font-heading);
+      min-height: 100vh;
+    }
+
+    /* Shader Canvas */
+    #shader-canvas {
+      position: fixed;
+      inset: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      pointer-events: none;
+      display: block;
+    }
+
+    /* Site Header */
+    .site-header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      padding: 2rem 3rem;
+      z-index: 999; /* Higher than menu overlay to guarantee clickability */
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      pointer-events: none; /* Let clicks pass through empty bar space */
+    }
+
+    .brand-logo {
+      font-size: 1.25rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      color: var(--text-black);
+      text-decoration: none;
+      pointer-events: auto;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+      pointer-events: auto;
+    }
+
+    .nav-toggle-label {
+      font-family: var(--font-subtext);
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--text-black);
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+    }
+
+    .nav-close-btn {
+      background: rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 0, 0, 0.15);
+      border-radius: 9999px;
+      padding: 0.6rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      color: var(--text-black);
+      outline: none;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+      transition: background 0.3s ease;
+    }
+
+    .nav-close-btn:hover {
+      background: rgba(255, 255, 255, 0.75);
+    }
+
+    .menu-button-text {
+      position: relative;
+      overflow: hidden;
+      height: 1.2rem;
+      line-height: 1.2rem;
+      font-family: var(--font-heading);
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+
+    .menu-button-icon {
+      width: 14px;
+      height: 14px;
+      display: block;
+      transform-origin: center;
+    }
+
+    /* Hero Section */
+    .hero-container {
+      position: relative;
+      z-index: 10;
+      min-height: 90vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 6rem 2rem 2rem;
+    }
+
+    .hero-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.4rem 1rem;
+      border-radius: 9999px;
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 2rem;
+      color: var(--text-black);
+      font-weight: 600;
+    }
+
+    .hero-pill span {
+      display: inline-block;
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: #008744;
+    }
+
+    .hero-title {
+      font-family: var(--font-heading);
+      font-size: clamp(1rem, 5vw, 7.5rem);
+      font-weight: 700;
+      line-height: 0.95;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      max-width: 1200px;
+      color: var(--text-black);
+    }
+
+    .hero-subtext {
+      font-family: var(--font-subtext);
+      font-size: clamp(1.2rem, 2.5vw, 1.85rem);
+      font-style: italic;
+      color: var(--text-black);
+      margin-top: 2rem;
+      max-width: 680px;
+      line-height: 1.5;
+      font-weight: 600;
+    }
+
+    .hero-cta-group {
+      margin-top: 3rem;
+      display: flex;
+      gap: 1.25rem;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn {
+      padding: 0.9rem 2rem;
+      border-radius: 9999px;
+      font-family: var(--font-heading);
+      font-size: 0.9rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+
+    .btn-primary {
+      background: #000;
+      color: #fff;
+    }
+
+    .btn-primary:hover {
+      background: #262626;
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.4);
+      color: #000;
+      border: 1px solid rgba(0, 0, 0, 0.15);
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.7);
+      transform: translateY(-2px);
+    }
+
+    /* LIQUID GLASS CARD SECTION */
+    .liquid-section {
+      position: relative;
+      z-index: 10;
+      padding: 4rem 2rem 8rem;
+      display: flex;
+      justify-content: center;
+    }
+
+    .liquid-card {
+      position: relative;
+      max-width: 900px;
+      width: 100%;
+      border-radius: 36px;
+      padding: 3.5rem;
+      overflow: hidden;
+      
+      background: radial-gradient(
+        120% 140% at 20% 10%,
+        rgba(255, 255, 255, 0.65) 0%,
+        rgba(255, 255, 255, 0.25) 30%,
+        rgba(255, 255, 255, 0.08) 60%,
+        rgba(255, 255, 255, 0.3) 100%
+      );
+      
+      border: 1.5px solid rgba(255, 255, 255, 0.75);
+      border-bottom-color: rgba(255, 255, 255, 0.3);
+      border-right-color: rgba(255, 255, 255, 0.35);
+
+      box-shadow: 
+        0 20px 40px -15px rgba(0, 0, 0, 0.08),
+        0 35px 65px -10px rgba(0, 50, 30, 0.05),
+        inset 0 1px 1px 0 rgba(255, 255, 255, 0.9),
+        inset 0 -10px 20px -5px rgba(255, 255, 255, 0.35),
+        inset 1px 0 3px rgba(255, 255, 255, 0.5);
+
+      backdrop-filter: url(#liquid-distortion) contrast(1.1) brightness(1.05);
+      -webkit-backdrop-filter: contrast(1.1) brightness(1.05);
+    }
+
+    .liquid-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.5) 0%,
+        rgba(255, 255, 255, 0.1) 35%,
+        transparent 50%,
+        rgba(255, 255, 255, 0.15) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .liquid-card-content {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    .liquid-tag {
+      font-size: 0.85rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: #000;
+      display: inline-block;
+    }
+
+    .liquid-card-title {
+      font-family: var(--font-heading);
+      font-size: clamp(2rem, 4vw, 3.25rem);
+      font-weight: 700;
+      color: #000;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+    }
+
+    .liquid-card-body {
+      font-family: var(--font-subtext);
+      font-size: 1.2rem;
+      color: #000;
+      line-height: 1.6;
+      max-width: 680px;
+    }
+
+    .liquid-card-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 2rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .stat-item h4 {
+      font-size: 2.5rem;
+      font-family: var(--font-heading);
+      font-weight: 700;
+      color: #000;
+      line-height: 1;
+    }
+
+    .stat-item p {
+      font-family: var(--font-subtext);
+      font-size: 0.95rem;
+      color: #111;
+      margin-top: 0.4rem;
+    }
+
+    /* KINETIC NAVIGATION OVERLAY & LIQUID GLASS MENU PANEL */
+    .nav-overlay-wrapper {
+      position: fixed;
+      inset: 0;
+      z-index: 900;
+      display: none;
+    }
+
+    .overlay-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.25);
+      opacity: 0;
+      cursor: pointer;
+    }
+
+    /* Liquid Glass styling applied directly to the slide-out menu panel */
+    .menu-content {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 100%;
+      max-width: 580px;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border-left: 1.5px solid rgba(255, 255, 255, 0.85);
+      background: radial-gradient(
+        130% 120% at 85% 10%,
+        rgba(255, 255, 255, 0.7) 0%,
+        rgba(255, 255, 255, 0.45) 40%,
+        rgba(255, 255, 255, 0.2) 85%
+      );
+      box-shadow: 
+        -25px 0 50px -10px rgba(0, 0, 0, 0.1),
+        inset 1.5px 0 2px 0 rgba(255, 255, 255, 0.95),
+        inset -10px 0 30px rgba(255, 255, 255, 0.3);
+      backdrop-filter: url(#liquid-distortion) contrast(1.1) brightness(1.03);
+      -webkit-backdrop-filter: contrast(1.1) brightness(1.03);
+    }
+
+    /* Glossy specular reflection stripe */
+    .menu-content::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        125deg,
+        rgba(255, 255, 255, 0.4) 0%,
+        transparent 35%,
+        rgba(255, 255, 255, 0.15) 100%
+      );
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .menu-bg {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .backdrop-layer {
+      position: absolute;
+      inset: 0;
+      transform: translateX(101%);
+      pointer-events: none;
+    }
+
+    .backdrop-layer.first {
+      background: rgba(15, 110, 60, 0.04);
+    }
+
+    .backdrop-layer.second {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .ambient-background-shapes {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+
+    .bg-shape {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+    }
+
+    .bg-shape.active {
+      opacity: 1;
+    }
+
+    .menu-content-wrapper {
+      position: relative;
+      z-index: 5;
+      padding: 5rem 4rem;
+    }
+
+    .menu-eyebrow {
+      font-family: var(--font-subtext);
+      font-style: italic;
+      font-size: 1.1rem;
+      color: var(--text-black);
+      margin-bottom: 2rem;
+      display: block;
+    }
+
+    .menu-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    .menu-list-item {
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .menu-item-idx {
+      font-family: var(--font-subtext);
+      font-style: italic;
+      font-size: 1rem;
+      color: rgba(0, 0, 0, 0.4);
+      min-width: 1.8rem;
+    }
+
+    .nav-link {
+      display: inline-block;
+      text-decoration: none;
+      color: var(--text-black);
+      font-family: var(--font-heading);
+      font-size: clamp(2.2rem, 5vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.1;
+      text-transform: uppercase;
+      letter-spacing: -0.02em;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-link:hover .nav-link-text {
+      color: #0f6e3c;
+      transform: translateX(12px);
+    }
+
+    .nav-link-text {
+      display: inline-block;
+      transition: transform 0.3s cubic-bezier(0.65, 0.01, 0.05, 0.99), color 0.3s ease;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SVG Filter for the Liquid Distortion Refraction -->
+  <svg style="position: absolute; width: 0; height: 0; pointer-events: none;" aria-hidden="true">
+    <filter id="liquid-distortion" x="-20%" y="-20%" width="140%" height="140%">
+      <feTurbulence type="fractalNoise" baseFrequency="0.015 0.012" numOctaves="2" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="12" xChannelSelector="R" yChannelSelector="G" />
+    </filter>
+  </svg>
+
+  <!-- WebGL Shader Background Canvas -->
+  <canvas id="shader-canvas"></canvas>
+
+  <!-- Site Header -->
+  <header class="site-header">
+    <a href="#" class="brand-logo">D.A.R.T</a>
+    <div class="nav-actions">
+      <button type="button" class="nav-close-btn" id="menu-toggle" aria-label="Toggle navigation">
+        <div class="menu-button-text">
+          <p class="menu-state-text">Menu</p>
+        </div>
+        <svg class="menu-button-icon" viewBox="0 0 16 16" fill="none">
+          <path d="M7.33333 16V0H8.66667V16H7.33333Z" fill="currentColor"></path>
+          <path d="M16 8.66667H0V7.33333H16V8.66667Z" fill="currentColor"></path>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- Hero Content -->
+  <main class="hero-container">
+    <h1 class="hero-title">Disaster Assessment & Response Technology</h1>
+    <p class="hero-subtext">
+      An offline, cooperative two-rover emergency reconnaissance prototype developed for rapid indoor situational assessment. 
+    </p>
+    <div class="hero-cta-group">
+      <a href="#explore" class="btn btn-primary">Begin Experience</a>
+      <a href="#documentation" class="btn btn-secondary">Documentation</a>
+    </div>
+  </main>
+
+  <!-- Liquid Glass Section Card -->
+  <section class="liquid-section">
+    <article class="liquid-card">
+      <div class="liquid-card-content">
+        <span class="liquid-tag">Refractive Dynamics</span>
+        <h2 class="liquid-card-title">Fluid Refraction &amp; Glass Kinetics</h2>
+        <p class="liquid-card-body">
+          Engineered using high-specularity light transmission and dynamic caustics. Rather than scattering all background detail like typical frosted surfaces, this fluid layer preserves the motion underneath while bending light along organic contours.
+        </p>
+
+        <div class="liquid-card-stats">
+          <div class="stat-item">
+            <h4>1.49</h4>
+            <p>Refractive Index Spec</p>
+          </div>
+          <div class="stat-item">
+            <h4>60 FPS</h4>
+            <p>GPU Native Rendering</p>
+          </div>
+          <div class="stat-item">
+            <h4>0.0%</h4>
+            <p>Opaque Frosting</p>
+          </div>
+        </div>
+      </div>
+    </article>
+  </section>
+
+  <!-- Kinetic Navigation Overlay with Liquid Glass Menu -->
+  <aside class="nav-overlay-wrapper" id="nav-overlay" data-nav="closed">
+    <div class="overlay-backdrop" id="overlay-bg"></div>
+    <nav class="menu-content" id="menu-panel">
+      <div class="menu-bg">
+        <div class="backdrop-layer first"></div>
+        <div class="backdrop-layer second"></div>
+        <div class="backdrop-layer"></div>
+
+        <div class="ambient-background-shapes">
+          <svg class="bg-shape bg-shape-1" viewBox="0 0 400 400" fill="none">
+            <circle class="shape-element" cx="80" cy="120" r="40" fill="rgba(0, 0, 0, 0.08)" />
+            <circle class="shape-element" cx="300" cy="80" r="60" fill="rgba(15, 110, 60, 0.12)" />
+            <circle class="shape-element" cx="200" cy="300" r="80" fill="rgba(0, 0, 0, 0.06)" />
+            <circle class="shape-element" cx="350" cy="280" r="30" fill="rgba(0, 0, 0, 0.08)" />
+          </svg>
+
+          <svg class="bg-shape bg-shape-2" viewBox="0 0 400 400" fill="none">
+            <path class="shape-element" d="M0 200 Q100 100, 200 200 T 400 200" stroke="rgba(0, 0, 0, 0.1)" stroke-width="60" fill="none" />
+            <path class="shape-element" d="M0 280 Q100 180, 200 280 T 400 280" stroke="rgba(15, 110, 60, 0.1)" stroke-width="40" fill="none" />
+          </svg>
+
+          <svg class="bg-shape bg-shape-3" viewBox="0 0 400 400" fill="none">
+            <circle class="shape-element" cx="60" cy="60" r="10" fill="rgba(0, 0, 0, 0.15)" />
+            <circle class="shape-element" cx="160" cy="60" r="10" fill="rgba(15, 110, 60, 0.2)" />
+            <circle class="shape-element" cx="260" cy="60" r="10" fill="rgba(0, 0, 0, 0.15)" />
+            <circle class="shape-element" cx="60" cy="160" r="14" fill="rgba(0, 0, 0, 0.1)" />
+            <circle class="shape-element" cx="160" cy="160" r="14" fill="rgba(15, 110, 60, 0.15)" />
+            <circle class="shape-element" cx="260" cy="160" r="14" fill="rgba(0, 0, 0, 0.1)" />
+          </svg>
+
+          <svg class="bg-shape bg-shape-4" viewBox="0 0 400 400" fill="none">
+            <path class="shape-element" d="M100 100 Q150 50, 200 100 Q250 150, 200 200 Q150 250, 100 200 Q50 150, 100 100" fill="rgba(15, 110, 60, 0.12)" />
+            <path class="shape-element" d="M250 200 Q300 150, 350 200 Q400 250, 350 300 Q300 350, 250 300 Q200 250, 250 200" fill="rgba(0, 0, 0, 0.08)" />
+          </svg>
+
+          <svg class="bg-shape bg-shape-5" viewBox="0 0 400 400" fill="none">
+            <line class="shape-element" x1="0" y1="100" x2="300" y2="400" stroke="rgba(0, 0, 0, 0.1)" stroke-width="30" />
+            <line class="shape-element" x1="100" y1="0" x2="400" y2="300" stroke="rgba(15, 110, 60, 0.1)" stroke-width="25" />
+            <line class="shape-element" x1="200" y1="0" x2="400" y2="200" stroke="rgba(0, 0, 0, 0.08)" stroke-width="20" />
+          </svg>
+        </div>
+      </div>
+
+      <div class="menu-content-wrapper">
+        <span class="menu-eyebrow">Index Navigation</span>
+        <ul class="menu-list">
+          <li class="menu-list-item" data-shape="1">
+            <span class="menu-item-idx">01</span>
+            <a href="#" class="nav-link"><span class="nav-link-text">About us</span></a>
+          </li>
+          <li class="menu-list-item" data-shape="2">
+            <span class="menu-item-idx">02</span>
+            <a href="#" class="nav-link"><span class="nav-link-text">Our work</span></a>
+          </li>
+          <li class="menu-list-item" data-shape="3">
+            <span class="menu-item-idx">03</span>
+            <a href="#" class="nav-link"><span class="nav-link-text">Services</span></a>
+          </li>
+          <li class="menu-list-item" data-shape="4">
+            <span class="menu-item-idx">04</span>
+            <a href="#" class="nav-link"><span class="nav-link-text" data-menu-fade>Blog</span></a>
+          </li>
+          <li class="menu-list-item" data-shape="5">
+            <span class="menu-item-idx">05</span>
+            <a href="#" class="nav-link"><span class="nav-link-text">Contact us</span></a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+  </aside>
+
+  <script>
+    // --- 1. WebGL Silk Shader Initialization ---
+    const VERT = `attribute vec2 a_position;
+    void main() {
+      gl_Position = vec4(a_position, 0.0, 1.0);
+    }`;
+
+    const FRAG = `#ifdef GL_FRAGMENT_PRECISION_HIGH
+    precision highp float;
+    #else
+    precision mediump float;
+    #endif
+
+    uniform vec3 u_colors[8];
+    uniform vec4 u_scene;
+    uniform vec4 u_shape;
+    uniform vec4 u_surface;
+    uniform vec4 u_finish;
+    uniform vec4 u_transform;
+    uniform vec4 u_space;
+    uniform vec4 u_cursor;
+
+    #define u_resolution u_scene.xy
+    #define u_time u_scene.z
+    #define u_colorCount u_scene.w
+    #define u_scale u_shape.x
+    #define u_intensity u_shape.y
+    #define u_paramA u_shape.z
+    #define u_warp u_shape.w
+    #define u_detail u_surface.x
+    #define u_contrast u_surface.y
+    #define u_brightness u_surface.z
+    #define u_saturation u_surface.w
+    #define u_hue u_finish.x
+    #define u_vignette u_finish.y
+    #define u_blur u_finish.z
+    #define u_grain u_finish.w
+    #ifdef GL_FRAGMENT_PRECISION_HIGH
+    #define u_seed u_transform.x
+    #else
+    #define u_seed mod(u_transform.x, 31.0)
+    #endif
+    #define u_rotate u_transform.y
+    #define u_drift u_transform.z
+    #define u_oklab u_transform.w
+    #define u_offset u_space.xy
+    #define u_mouse u_space.zw
+    #define u_cursorPresence u_cursor.x
+    #define u_cursorEffect u_cursor.y
+    #define u_cursorStrength u_cursor.z
+    #define u_cursorRadius u_cursor.w
+
+    float hash21(vec2 p) {
+    #ifndef GL_FRAGMENT_PRECISION_HIGH
+      p = mod(p, 31.0);
+    #endif
+      p = fract(p * vec2(234.34, 435.345));
+      p += dot(p, p + 34.23);
+      return fract(p.x * p.y);
+    }
+
+    float grainHash(vec2 p) {
+      vec3 p3 = fract(vec3(p.xyx) * 0.1031);
+      p3 += dot(p3, p3.yzx + 33.33);
+      return fract((p3.x + p3.y) * p3.z);
+    }
+
+    float noise(vec2 p) {
+      vec2 i = floor(p);
+      vec2 f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(
+        mix(hash21(i), hash21(i + vec2(1.0, 0.0)), u.x),
+        mix(hash21(i + vec2(0.0, 1.0)), hash21(i + vec2(1.0, 1.0)), u.x),
+        u.y);
+    }
+
+    float fbm(vec2 p) {
+      float v = 0.0;
+      float a = 0.5;
+      for (int i = 0; i < 5; i++) {
+        v += a * noise(p);
+        p = p * 2.03 + vec2(17.0, 9.2);
+        a *= 0.5;
+      }
+      return v;
+    }
+
+    vec3 srgbToLinear(vec3 c) {
+      return mix(c / 12.92, pow((c + 0.055) / 1.055, vec3(2.4)), step(0.04045, c));
+    }
+    vec3 linearToSrgb(vec3 c) {
+      return mix(c * 12.92, 1.055 * pow(max(c, vec3(0.0)), vec3(1.0 / 2.4)) - 0.055, step(0.031308, c));
+    }
+    vec3 linToOklab(vec3 c) {
+      float l = 0.4122214708 * c.r + 0.5363325363 * c.g + 0.0514459929 * c.b;
+      float m = 0.2119034982 * c.r + 0.6806995451 * c.g + 0.1073969566 * c.b;
+      float s = 0.0883024619 * c.r + 0.2817188376 * c.g + 0.6299787005 * c.b;
+      l = pow(max(l, 0.0), 1.0 / 3.0);
+      m = pow(max(m, 0.0), 1.0 / 3.0);
+      s = pow(max(s, 0.0), 1.0 / 3.0);
+      return vec3(
+        0.2104542553 * l + 0.7936177850 * m - 0.0040720468 * s,
+        1.9779984951 * l - 2.4285922050 * m + 0.4505937099 * s,
+        0.0259040371 * l + 0.7827717662 * m - 0.8086757660 * s);
+    }
+    vec3 oklabToLin(vec3 c) {
+      float l = c.x + 0.3963377774 * c.y + 0.2158037573 * c.z;
+      float m = c.x - 0.1055613458 * c.y - 0.0638541728 * c.z;
+      float s = c.x - 0.0894841775 * c.y - 1.2914855480 * c.z;
+      l = l * l * l; m = m * m * m; s = s * s * s;
+      return vec3(
+        4.0767416621 * l - 3.3077115913 * m + 0.2309699292 * s,
+        -1.2684380046 * l + 2.6097574011 * m - 0.3413193965 * s,
+        -0.0041960863 * l - 0.7034186147 * m + 1.7076147010 * s);
+    }
+    vec3 mixColour(vec3 a, vec3 b, float t) {
+      if (u_oklab > 0.5) {
+        vec3 la = linToOklab(srgbToLinear(a));
+        vec3 lb = linToOklab(srgbToLinear(b));
+        return clamp(linearToSrgb(oklabToLin(mix(la, lb, t))), 0.0, 1.0);
+      }
+      return mix(a, b, t);
+    }
+
+    vec3 palette(float x) {
+      float n = max(u_colorCount - 1.0, 1.0);
+      float f = clamp(x, 0.0, 1.0) * n;
+      vec3 col = u_colors[0];
+      for (int i = 0; i < 7; i++) {
+        if (float(i) < n)
+          col = mixColour(col, u_colors[i + 1], smoothstep(0.0, 1.0, clamp(f - float(i), 0.0, 1.0)));
+      }
+      return col;
+    }
+
+    vec3 shade(vec2 uv, vec2 p, float t) {
+      vec2 q = p * 1.6;
+      float amp = 0.25 + u_intensity * 0.85;
+      for (float i = 1.0; i < 5.0; i += 1.0) {
+        q.x += amp / i * cos(i * 2.4 * q.y + t * 0.8 + u_seed);
+        q.y += amp / i * cos(i * 1.7 * q.x + t * 0.6);
+      }
+      return palette(0.5 + 0.5 * sin(q.x + q.y));
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / u_resolution.xy;
+      vec2 p = (gl_FragCoord.xy - 0.5 * u_resolution.xy) / min(u_resolution.x, u_resolution.y);
+      uv = p * min(u_resolution.x, u_resolution.y) / u_resolution.xy + 0.5;
+      p *= u_scale;
+
+      if (abs(u_rotate) > 0.0001) {
+        float cr = cos(u_rotate), sr = sin(u_rotate);
+        p = mat2(cr, -sr, sr, cr) * p;
+      }
+      p += u_offset;
+
+      vec3 col = shade(uv, p, u_time);
+      if (abs(u_contrast - 1.0) > 0.0001) col = (col - 0.5) * u_contrast + 0.5;
+      if (u_grain > 0.0001) col += (grainHash(gl_FragCoord.xy + vec2(u_seed * 17.0, u_seed * 31.0)) - 0.5) * u_grain;
+      gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+    }`;
+
+    const UNIFORMS = {
+      colors: [
+        [0.85, 0.92, 0.88], [0.72, 0.88, 0.78],
+        [0.60, 0.82, 0.70], [0.94, 0.98, 0.95],
+        [0.94, 0.98, 0.95], [0.94, 0.98, 0.95],
+        [0.94, 0.98, 0.95], [0.94, 0.98, 0.95]
+      ],
+      colorCount: 4,
+      scale: 0.58,
+      intensity: 0.2,
+      paramA: 0.5,
+      warp: 0.0,
+      detail: 2.4,
+      contrast: 0.807,
+      brightness: 0.0,
+      saturation: 1.0,
+      hue: 0.0,
+      vignette: 0.0,
+      blur: 0.0,
+      grain: 0.014,
+      seed: 707.0,
+      rotate: 2.5133,
+      offsetX: 0.06,
+      offsetY: 0.6,
+      drift: 0.0,
+      oklab: 0.0,
+      timeScale: 0.841
+    };
+
+    const canvas = document.getElementById("shader-canvas");
+    const gl = canvas.getContext("webgl", { antialias: false });
+
+    if (gl) {
+      const compile = (type, src) => {
+        const s = gl.createShader(type);
+        gl.shaderSource(s, src);
+        gl.compileShader(s);
+        return s;
+      };
+      const program = gl.createProgram();
+      gl.attachShader(program, compile(gl.VERTEX_SHADER, VERT));
+      gl.attachShader(program, compile(gl.FRAGMENT_SHADER, FRAG));
+      gl.linkProgram(program);
+      gl.useProgram(program);
+
+      const buf = gl.createBuffer();
+      gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+      gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+      const loc = gl.getAttribLocation(program, "a_position");
+      gl.enableVertexAttribArray(loc);
+      gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+      const uni = {
+        colors: gl.getUniformLocation(program, "u_colors"),
+        scene: gl.getUniformLocation(program, "u_scene"),
+        shape: gl.getUniformLocation(program, "u_shape"),
+        surface: gl.getUniformLocation(program, "u_surface"),
+        finish: gl.getUniformLocation(program, "u_finish"),
+        transform: gl.getUniformLocation(program, "u_transform"),
+        space: gl.getUniformLocation(program, "u_space"),
+        cursor: gl.getUniformLocation(program, "u_cursor")
+      };
+
+      gl.uniform3fv(uni.colors, new Float32Array(UNIFORMS.colors.flat()));
+      gl.uniform4f(uni.shape, UNIFORMS.scale, UNIFORMS.intensity, UNIFORMS.paramA, UNIFORMS.warp);
+      gl.uniform4f(uni.surface, UNIFORMS.detail, UNIFORMS.contrast, UNIFORMS.brightness, UNIFORMS.saturation);
+      gl.uniform4f(uni.finish, UNIFORMS.hue, UNIFORMS.vignette, UNIFORMS.blur, UNIFORMS.grain);
+      gl.uniform4f(uni.transform, UNIFORMS.seed, UNIFORMS.rotate, UNIFORMS.drift, UNIFORMS.oklab);
+      gl.uniform4f(uni.cursor, 0, 0, 0, 0);
+
+      const resize = () => {
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        canvas.width = window.innerWidth * dpr;
+        canvas.height = window.innerHeight * dpr;
+        gl.viewport(0, 0, canvas.width, canvas.height);
+      };
+      window.addEventListener("resize", resize);
+      resize();
+
+      const startTime = performance.now();
+      const render = (now) => {
+        gl.uniform4f(uni.scene, canvas.width, canvas.height, ((now - startTime) / 1000) * UNIFORMS.timeScale, UNIFORMS.colorCount);
+        gl.uniform4f(uni.space, UNIFORMS.offsetX, UNIFORMS.offsetY, 0, 0);
+        gl.drawArrays(gl.TRIANGLES, 0, 3);
+        requestAnimationFrame(render);
+      };
+      requestAnimationFrame(render);
+    }
+
+    // --- 2. Kinetic Navigation Logic with GSAP ---
+    if (window.gsap && window.CustomEase) {
+      gsap.registerPlugin(CustomEase);
+      try {
+        CustomEase.create("main", "0.65, 0.01, 0.05, 0.99");
+        gsap.defaults({ ease: "main", duration: 0.7 });
+      } catch (e) {
+        gsap.defaults({ ease: "power2.out", duration: 0.7 });
+      }
+    }
+
+    const navOverlay = document.getElementById("nav-overlay");
+    const menuToggle = document.getElementById("menu-toggle");
+    const toggleLabel = document.getElementById("toggle-label");
+    const overlayBg = document.getElementById("overlay-bg");
+    const menuPanel = document.getElementById("menu-panel");
+    const bgPanels = document.querySelectorAll(".backdrop-layer");
+    const menuLinks = document.querySelectorAll(".nav-link");
+    const fadeTargets = document.querySelectorAll("[data-menu-fade]");
+    const buttonIcon = document.querySelector(".menu-button-icon");
+    const buttonText = document.querySelector(".menu-state-text");
+
+    let isMenuOpen = false;
+    let isAnimating = false;
+
+    const openMenu = () => {
+      if (isAnimating) return;
+      isAnimating = true;
+      isMenuOpen = true;
+
+      navOverlay.style.display = "block";
+      navOverlay.setAttribute("data-nav", "open");
+      buttonText.textContent = "Close";
+
+      const tl = gsap.timeline({
+        onComplete: () => { isAnimating = false; }
+      });
+
+      tl.set(menuPanel, { xPercent: 100 })
+        .to(menuPanel, { xPercent: 0, duration: 0.65, ease: "main" })
+        .fromTo(buttonIcon, { rotate: 0 }, { rotate: 315, duration: 0.4 }, 0)
+        .fromTo(overlayBg, { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.4 }, 0)
+        .fromTo(bgPanels, { xPercent: 101 }, { xPercent: 0, stagger: 0.1, duration: 0.5 }, 0.1)
+        .fromTo(menuLinks, { yPercent: 120, rotate: 6 }, { yPercent: 0, rotate: 0, stagger: 0.04, duration: 0.5 }, 0.25);
+
+      if (fadeTargets.length) {
+        tl.fromTo(fadeTargets, { autoAlpha: 0, yPercent: 40 }, { autoAlpha: 1, yPercent: 0, stagger: 0.04, clearProps: "all" }, 0.35);
+      }
+    };
+
+    const closeMenu = () => {
+      if (isAnimating) return;
+      isAnimating = true;
+      isMenuOpen = false;
+
+      navOverlay.setAttribute("data-nav", "closed");
+      buttonText.textContent = "Menu";
+
+      const tl = gsap.timeline({
+        onComplete: () => {
+          navOverlay.style.display = "none";
+          isAnimating = false;
+        }
+      });
+
+      tl.to(menuPanel, { xPercent: 100, duration: 0.5, ease: "power3.in" })
+        .to(buttonIcon, { rotate: 0, duration: 0.3 }, 0)
+        .to(overlayBg, { autoAlpha: 0, duration: 0.3 }, 0.1);
+    };
+
+    const toggleNav = (e) => {
+      if (e) e.stopPropagation();
+      if (isMenuOpen) {
+        closeMenu();
+      } else {
+        openMenu();
+      }
+    };
+
+    // Event listeners
+    menuToggle.addEventListener("click", toggleNav);
+    toggleLabel.addEventListener("click", toggleNav);
+    overlayBg.addEventListener("click", closeMenu);
+
+    window.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && isMenuOpen) closeMenu();
+    });
+
+    // Shapes logic on list items
+    const menuItems = document.querySelectorAll(".menu-list-item[data-shape]");
+    const shapesContainer = document.querySelector(".ambient-background-shapes");
+
+    menuItems.forEach((item) => {
+      const shapeIndex = item.getAttribute("data-shape");
+      const shape = shapesContainer ? shapesContainer.querySelector(`.bg-shape-${shapeIndex}`) : null;
+      if (!shape) return;
+
+      const shapeEls = shape.querySelectorAll(".shape-element");
+
+      item.addEventListener("mouseenter", () => {
+        shapesContainer.querySelectorAll(".bg-shape").forEach((s) => s.classList.remove("active"));
+        shape.classList.add("active");
+        gsap.fromTo(
+          shapeEls,
+          { scale: 0.5, opacity: 0, rotation: -10 },
+          { scale: 1, opacity: 1, rotation: 0, duration: 0.6, stagger: 0.08, ease: "back.out(1.7)", overwrite: "auto" }
+        );
+      });
+
+      item.addEventListener("mouseleave", () => {
+        gsap.to(shapeEls, {
+          scale: 0.8,
+          opacity: 0,
+          duration: 0.3,
+          ease: "power2.in",
+          onComplete: () => shape.classList.remove("active"),
+          overwrite: "auto"
+        });
+      });
+    });
+  </script>
+</body>
+</html>
