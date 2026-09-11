@@ -470,14 +470,124 @@
     }
 
     @media (max-width: 768px) {
+      .bg-layer {
+        background-image: url('wallphone.png');
+        background-position: center center;
+      }
+
       .top-bar {
-        padding: 1.4rem 1.6rem;
+        padding: max(1.1rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) 1.1rem max(1rem, env(safe-area-inset-left));
       }
+
+      .brand-title {
+        font-size: clamp(1.05rem, 5vw, 1.3rem);
+      }
+
+      .brand-sub {
+        max-width: 14rem;
+        font-size: clamp(0.66rem, 2.8vw, 0.82rem);
+      }
+
+      .menu-toggle {
+        gap: 0.55rem;
+        padding: 8px 0 8px 8px;
+      }
+
       .courses-wrapper {
-        padding: 2.5rem 1.5rem;
+        padding: 2.5rem max(1rem, env(safe-area-inset-right)) 4rem max(1rem, env(safe-area-inset-left));
       }
+
+      .catalog-header {
+        margin-bottom: 2rem;
+      }
+
+      .catalog-title {
+        font-size: clamp(2.35rem, 11vw, 4rem);
+      }
+
+      .catalog-description {
+        font-size: 0.98rem;
+      }
+
+      .filter-bar {
+        width: 100%;
+        gap: 0.35rem;
+        margin-bottom: 2rem;
+        border-radius: 18px;
+      }
+
+      .filter-btn {
+        flex: 1 1 auto;
+        padding: 0.55rem 0.7rem;
+        font-size: 0.72rem;
+      }
+
       .course-grid {
         grid-template-columns: 1fr;
+        gap: 1rem;
+      }
+
+      .course-card {
+        min-height: 0;
+        padding: 1.35rem;
+        border-radius: 22px;
+      }
+
+      .card-head {
+        margin-bottom: 1.35rem;
+      }
+
+      .course-title {
+        font-size: clamp(1.75rem, 8vw, 2.1rem);
+      }
+
+      .course-summary {
+        font-size: 0.88rem;
+      }
+
+      .card-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.8rem;
+      }
+
+      .course-specs {
+        gap: 0.7rem;
+        flex-wrap: wrap;
+      }
+
+      .liquid-sidebar {
+        top: 8px;
+        right: 8px;
+        bottom: 8px;
+        width: min(400px, calc(100vw - 16px));
+        padding: 1.5rem;
+        border-radius: 24px;
+      }
+
+      .nav-links {
+        margin-top: 2rem;
+        gap: 1.1rem;
+      }
+
+      .nav-links a {
+        font-size: clamp(1.65rem, 8vw, 2.1rem);
+      }
+    }
+
+    @media (max-width: 480px) {
+      .filter-btn {
+        flex-basis: calc(50% - 0.35rem);
+      }
+
+      .course-card {
+        padding: 1.15rem;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce), (hover: none) and (pointer: coarse) {
+      .course-card:hover {
+        transform: none;
       }
     }
   </style>

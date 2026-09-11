@@ -55,6 +55,7 @@
       background-size: cover;
       pointer-events: none;
       will-change: transform;
+      transform: translate3d(var(--bg-x, 0px), var(--bg-y, 0px), 0) scale(1.04);
       z-index: 1;
     }
 
@@ -152,7 +153,7 @@
       position: absolute;
       top: 28%;
       left: 50%;
-      transform: translate(-50%, -20%);
+      transform: translate(calc(-50% + var(--text-x, 0px)), calc(-20% + var(--text-y, 0px)));
       width: 90%;
       max-width: 1100px;
       text-align: center;
@@ -338,20 +339,106 @@
     }
 
     @media (max-width: 768px) {
+      .hero-bg {
+        background-image: url('wallphone.png');
+        background-position: center center;
+      }
+
       .hero {
-        padding: 2rem 1.5rem;
+        padding: max(1.25rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
       }
+
+      .brand-title {
+        font-size: clamp(1.05rem, 5vw, 1.35rem);
+      }
+
+      .brand-sub {
+        font-size: clamp(0.68rem, 3vw, 0.82rem);
+      }
+
+      .menu-toggle {
+        gap: 0.55rem;
+        padding: 8px 0 8px 8px;
+      }
+
+      .menu-toggle > span {
+        font-size: 0.72rem;
+      }
+
       .editorial-content {
-        top: 25%;
-        width: 100%;
+        top: 23%;
+        width: min(100% - 2rem, 34rem);
       }
+
+      .eyebrow {
+        font-size: 0.68rem;
+        letter-spacing: 0.2em;
+        margin-bottom: 0.85rem;
+      }
+
+      .main-heading {
+        font-size: clamp(2.35rem, 11vw, 4.6rem);
+        line-height: 1.02;
+        margin-bottom: 1rem;
+      }
+
+      .lead-description {
+        font-size: clamp(0.9rem, 3.8vw, 1.05rem);
+        line-height: 1.45;
+      }
+
+      .hero-footer {
+        gap: 1rem;
+        font-size: 0.58rem;
+        letter-spacing: 0.08em;
+      }
+
+      .hero-footer div:last-child {
+        text-align: right;
+      }
+
       .liquid-sidebar {
         top: 8px;
         right: 8px;
         bottom: 8px;
-        padding: 2rem;
+        width: min(420px, calc(100vw - 16px));
+        padding: 1.5rem;
+        border-radius: 24px;
+      }
+
+      .sidebar-content {
+        margin-top: 2rem;
+      }
+
+      .nav-links {
+        gap: 1.15rem;
+      }
+
+      .nav-links a {
+        font-size: clamp(1.65rem, 8vw, 2.1rem);
       }
     }
+
+    @media (max-width: 480px) {
+      .editorial-content {
+        top: 20%;
+      }
+
+      .hero-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.35rem;
+      }
+
+      .hero-footer div:last-child {
+        text-align: left;
+      }
+
+      .sidebar-footer {
+        font-size: 0.75rem;
+      }
+    }
+
   </style>
 </head>
 <body>
@@ -448,6 +535,7 @@
     // --- Smooth Mouse Parallax Physics (Linear Interpolation) ---
     const heroBg = document.getElementById('heroBg');
     const heroText = document.getElementById('heroText');
+    const canParallax = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
     let targetMouseX = 0;
     let targetMouseY = 0;
@@ -461,14 +549,21 @@
     const bgMoveIntensity = 28;    // Max pixels wallpaper shifts
     const textMoveIntensity = 14;  // Max pixels text floats opposite
 
-    window.addEventListener('mousemove', (e) => {
-      // Normalize cursor coordinates from center: -1.0 to +1.0
-      const halfWidth = window.innerWidth / 2;
-      const halfHeight = window.innerHeight / 2;
+    if (canParallax) {
+      window.addEventListener('pointermove', (e) => {
+        // Normalize cursor coordinates from center: -1.0 to +1.0
+        const halfWidth = window.innerWidth / 2;
+        const halfHeight = window.innerHeight / 2;
 
-      targetMouseX = (e.clientX - halfWidth) / halfWidth;
-      targetMouseY = (e.clientY - halfHeight) / halfHeight;
-    });
+        targetMouseX = (e.clientX - halfWidth) / halfWidth;
+        targetMouseY = (e.clientY - halfHeight) / halfHeight;
+      });
+
+      window.addEventListener('pointerleave', () => {
+        targetMouseX = 0;
+        targetMouseY = 0;
+      });
+    }
 
     function animateParallax() {
       // Lerp calculations
@@ -478,12 +573,14 @@
       // 1. Move Background (following the camera glance)
       const bgX = currentX * bgMoveIntensity;
       const bgY = currentY * bgMoveIntensity;
-      heroBg.style.transform = `translate3d(${bgX}px, ${bgY}px, 0) scale(1.04)`;
+      heroBg.style.setProperty('--bg-x', `${bgX}px`);
+      heroBg.style.setProperty('--bg-y', `${bgY}px`);
 
       // 2. Move Text slightly in the counter direction for layered 3D depth
       const textX = -currentX * textMoveIntensity;
       const textY = -currentY * textMoveIntensity;
-      heroText.style.transform = `translate(calc(-50% + ${textX}px), calc(-20% + ${textY}px))`;
+      heroText.style.setProperty('--text-x', `${textX}px`);
+      heroText.style.setProperty('--text-y', `${textY}px`);
 
       requestAnimationFrame(animateParallax);
     }
