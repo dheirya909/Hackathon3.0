@@ -29,6 +29,7 @@
     }
 
     body, html {
+      width: 100%;
       min-height: 100vh;
       font-family: var(--font-clash);
       color: var(--text-black);
@@ -138,6 +139,7 @@
     .courses-wrapper {
       position: relative;
       z-index: 2;
+      width: 100%;
       max-width: 1380px;
       margin: 0 auto;
       padding: 4rem 4.5rem 7rem;
@@ -189,6 +191,7 @@
       margin-bottom: 3rem;
       padding: 0.4rem;
       width: fit-content;
+      max-width: 100%;
       background: rgba(255, 255, 255, 0.4);
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
@@ -220,13 +223,16 @@
     /* Frosted Glass Course Grid */
     .course-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 380px), 1fr));
       gap: 2.2rem;
+      align-items: stretch;
     }
 
     /* Liquid Frosted Course Card */
     .course-card {
       position: relative;
+      width: 100%;
+      min-width: 0;
       background: radial-gradient(
         130% 90% at 0% 0%,
         rgba(255, 255, 255, 0.72) 0%,
@@ -337,6 +343,9 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: auto;
       padding-top: 1.4rem;
       border-top: 1px solid rgba(255, 255, 255, 0.6);
     }
@@ -344,6 +353,7 @@
     .course-specs {
       display: flex;
       gap: 1.2rem;
+      flex-wrap: wrap;
       font-size: 0.78rem;
       font-weight: 500;
       color: var(--subtext-black);
