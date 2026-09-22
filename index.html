@@ -1,592 +1,594 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Verdant Solitude — Parallax Hero</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TRACE</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        :root {
+            --bg-base: #dcdcd9;
+            --ink-main: #111111;
+            --ink-muted: #4a4a46;
+            --accent-tactical: #bb3425;
+            --font-mono: 'Martian Mono', monospace;
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background-color: var(--bg-base);
+            font-family: var(--font-mono);
+            color: var(--ink-main);
+            cursor: none;
+        }
 
-  <!-- Typography: Playfair Display (Google Fonts) & Clash Display (Fontshare) -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet">
-  <link href="https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap" rel="stylesheet">
+        /* Subtle vignette */
+        .overlay-vignette {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 10;
+            box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.08);
+            background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.07) 100%);
+        }
 
-  <style>
-    :root {
-      --font-clash: 'Clash Display', -apple-system, BlinkMacSystemFont, sans-serif;
-      --font-playfair: 'Playfair Display', Georgia, serif;
-      --text-black: #0c0d0d;
-      --subtext-black: #2a2c2b;
-    }
+        /* Canvas Grid */
+        #grid {
+            position: fixed;
+            inset: 0;
+            width: 100vw;
+            height: 100vh;
+            display: block;
+            z-index: 1;
+        }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+        /* Asymmetric Editorial Hero Layout */
+        .editorial-stage {
+            position: fixed;
+            inset: 0;
+            z-index: 15;
+            pointer-events: none;
+        }
 
-    body, html {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: var(--font-clash);
-      color: var(--text-black);
-      background-color: #f7f9f6;
-    }
+        /* Unified Title + Subtitle Block sharing the same rotation */
+        .hero-group {
+            position: absolute;
+            top: clamp(6rem, 18vh, 13rem);
+            left: clamp(2rem, 6vw, 7rem);
+            max-width: min(90vw, 46rem);
+            transform: rotate(-2.5deg);
+            transform-origin: left top;
+            pointer-events: none;
+        }
 
-    /* Outer Wrapper */
-    .hero-wrapper {
-      position: relative;
-      width: 100vw;
-      height: 100vh;
-      overflow: hidden;
-    }
+        .hero-title {
+            margin: 0;
+            font-size: clamp(5.5rem, 16vw, 13.5rem);
+            line-height: 0.82;
+            font-weight: 800;
+            letter-spacing: -0.06em;
+            color: var(--ink-main);
+        }
 
-    /* Parallax Background Layer */
-    /* Scaled up slightly to allow motion without revealing borders */
-    .hero-bg {
-      position: absolute;
-      top: -5%;
-      left: -5%;
-      width: 110%;
-      height: 110%;
-      /* Update the image path below if needed */
-      background: url('wallpaper.png') no-repeat center bottom;
-      background-size: cover;
-      pointer-events: none;
-      will-change: transform;
-      transform: translate3d(var(--bg-x, 0px), var(--bg-y, 0px), 0) scale(1.04);
-      z-index: 1;
-    }
+        .hero-description {
+            margin: 1.8rem 0 0 0.4rem;
+            max-width: 34rem;
+            color: var(--ink-muted);
+            font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+            line-height: 1.6;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+        }
 
-    /* Foreground Content Layout */
-    .hero {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-      padding: 3rem 4.5rem;
-      z-index: 10;
-      pointer-events: none; /* Allows mouse events to pass cleanly */
-    }
+        /* Rover Frame: Shifted further down, transparent background, and image fits wholly */
+        .rover-frame {
+            position: absolute;
+            bottom: clamp(1.5rem, 5vh, 4rem);
+            right: clamp(2rem, 7vw, 9rem);
+            width: clamp(24rem, 50vw, 44rem);
+            aspect-ratio: 16 / 10;
+            background: transparent; /* Allows transparency & canvas grid behind it */
+            border: 1px dashed rgba(17, 17, 17, 0.35);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.65rem;
+            transform: rotate(3.2deg);
+            pointer-events: auto;
+        }
+        .rover-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Shows full image without cropping */
+            display: block;
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
+        }
+        .rover-frame .bracket {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-color: var(--ink-main);
+            pointer-events: none;
+        }
+        .bracket.tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
+        .bracket.tr { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; }
+        .bracket.bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; }
+        .bracket.br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; }
 
-    /* Top Navigation Header */
-    .top-bar {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      pointer-events: auto;
-    }
+        /* Menu Button with Uneven Rotating Orbitals */
+        .menu-wrapper {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            width: 4.2rem;
+            height: 4.2rem;
+            z-index: 60;
+            display: grid;
+            place-items: center;
+        }
+        .orbitals {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        .orbitals::before,
+        .orbitals::after {
+            content: '';
+            position: absolute;
+            border: 1.5px solid rgba(17, 17, 17, 0.45);
+        }
+        .orbitals::before {
+            inset: -4px;
+            border-radius: 56% 44% 63% 37% / 42% 58% 42% 58%;
+            animation: spinRingOne 14s linear infinite;
+        }
+        .orbitals::after {
+            inset: 3px;
+            border-color: var(--accent-tactical);
+            border-radius: 41% 59% 47% 53% / 59% 39% 61% 41%;
+            animation: spinRingTwo 9s linear infinite reverse;
+        }
+        @keyframes spinRingOne {
+            0% { transform: rotate(0deg) scaleY(0.7); }
+            100% { transform: rotate(360deg) scaleY(0.7); }
+        }
+        @keyframes spinRingTwo {
+            0% { transform: rotate(360deg) scaleY(0.85); }
+            100% { transform: rotate(0deg) scaleY(0.85); }
+        }
 
-    /* Top Left Title */
-    .brand {
-      display: flex;
-      flex-direction: column;
-      text-decoration: none;
-      color: var(--text-black);
-    }
+        .menu-toggle {
+            position: relative;
+            z-index: 2;
+            width: 2.8rem;
+            height: 2.8rem;
+            background: rgba(220, 220, 217, 0.85);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(17, 17, 17, 0.3);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            transition: all 0.25s ease;
+        }
+        .menu-toggle:hover {
+            border-color: var(--accent-tactical);
+            background: rgba(220, 220, 217, 1);
+        }
+        .menu-toggle span {
+            width: 1.1rem;
+            height: 2px;
+            background: var(--ink-main);
+            position: relative;
+            transition: background-color 0.2s;
+        }
+        .menu-toggle span::before,
+        .menu-toggle span::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--ink-main);
+            transition: transform 0.25s ease;
+        }
+        .menu-toggle span::before { top: -6px; }
+        .menu-toggle span::after { top: 6px; }
 
-    .brand-title {
-      font-family: var(--font-clash);
-      font-size: 1.45rem;
-      font-weight: 600;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      line-height: 1;
-    }
+        .menu-toggle.is-open span {
+            background: transparent;
+        }
+        .menu-toggle.is-open span::before {
+            transform: translateY(6px) rotate(45deg);
+            background: var(--accent-tactical);
+        }
+        .menu-toggle.is-open span::after {
+            transform: translateY(-6px) rotate(-45deg);
+            background: var(--accent-tactical);
+        }
 
-    .brand-sub {
-      font-family: var(--font-playfair);
-      font-style: italic;
-      font-size: 0.85rem;
-      color: var(--subtext-black);
-      letter-spacing: 0.05em;
-      margin-top: 4px;
-    }
+        /* Sidebar Navigation Drawer */
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(85vw, 22rem);
+            height: 100vh;
+            padding: 7rem 2.5rem 3rem;
+            background: rgba(225, 225, 221, 0.95);
+            backdrop-filter: blur(14px);
+            border-left: 1px solid rgba(17, 17, 17, 0.2);
+            z-index: 55;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.4rem;
+        }
+        .side-menu.is-open {
+            transform: translateX(0);
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            border-bottom: 1px dashed rgba(17, 17, 17, 0.25);
+            padding: 0.8rem 0;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--ink-main);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+        }
+        .nav-btn:hover {
+            color: var(--accent-tactical);
+            padding-left: 0.5rem;
+            border-bottom-color: var(--accent-tactical);
+        }
+        .nav-btn span.arrow {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            transition: transform 0.2s;
+        }
+        .nav-btn:hover span.arrow {
+            transform: translateX(4px);
+            opacity: 1;
+        }
 
-    /* Top Right Menu Toggle */
-    .menu-toggle {
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      padding: 8px 12px;
-      font-family: var(--font-clash);
-      font-size: 0.88rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--text-black);
-      transition: opacity 0.3s ease, transform 0.2s ease;
-    }
+        /* Work In Progress Alert Banner */
+        .alert-banner {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 80;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.6rem;
+            border-left: 4px solid var(--accent-tactical);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+        .alert-banner.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .alert-banner .tag {
+            color: var(--accent-tactical);
+            font-weight: 800;
+            margin-right: 0.6rem;
+        }
 
-    .menu-toggle:hover {
-      opacity: 0.7;
-      transform: translateY(-1px);
-    }
+        /* Liquid Cursor */
+        .liquid-layer {
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            z-index: 999;
+            filter: url("#liquid-filter");
+        }
+        .liquid-drop {
+            position: absolute;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background: #111111;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
+        .liquid-core {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: #111111;
+            transform: translate(-50%, -50%);
+            will-change: transform;
+        }
 
-    .menu-bars {
-      width: 26px;
-      height: 12px;
-      position: relative;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    .menu-bars span {
-      display: block;
-      width: 100%;
-      height: 1.8px;
-      background: var(--text-black);
-      border-radius: 2px;
-      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    /* Elegantly Placed Typography Layer */
-    .editorial-content {
-      position: absolute;
-      top: 28%;
-      left: 50%;
-      transform: translate(calc(-50% + var(--text-x, 0px)), calc(-20% + var(--text-y, 0px)));
-      width: 90%;
-      max-width: 1100px;
-      text-align: center;
-      pointer-events: none;
-      will-change: transform;
-    }
-
-    .eyebrow {
-      font-family: var(--font-clash);
-      font-size: 0.8rem;
-      font-weight: 600;
-      letter-spacing: 0.3em;
-      text-transform: uppercase;
-      margin-bottom: 1.2rem;
-      opacity: 0.75;
-    }
-
-    .main-heading {
-      font-family: var(--font-playfair);
-      font-size: clamp(3.2rem, 7vw, 6.4rem);
-      font-weight: 400;
-      line-height: 1.05;
-      letter-spacing: -0.025em;
-      color: var(--text-black);
-      margin-bottom: 1.6rem;
-    }
-
-    .main-heading em {
-      font-family: var(--font-playfair);
-      font-style: italic;
-      font-weight: 300;
-    }
-
-    .lead-description {
-      font-family: var(--font-clash);
-      font-size: clamp(1rem, 1.25vw, 1.15rem);
-      font-weight: 400;
-      line-height: 1.6;
-      max-width: 520px;
-      margin: 0 auto;
-      color: var(--subtext-black);
-      opacity: 0.85;
-      letter-spacing: 0.01em;
-    }
-
-    /* Bottom Status/Coordinates */
-    .hero-footer {
-      width: 100%;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      pointer-events: auto;
-    }
-
-    /* LIQUID GLASS SIDEBAR */
-    .sidebar-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(12, 13, 13, 0.08);
-      backdrop-filter: blur(4px);
-      -webkit-backdrop-filter: blur(4px);
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.5s ease;
-      z-index: 40;
-    }
-
-    .sidebar-overlay.active {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .liquid-sidebar {
-      position: fixed;
-      top: 16px;
-      right: 16px;
-      bottom: 16px;
-      width: 420px;
-      max-width: calc(100vw - 32px);
-      border-radius: 36px;
-      z-index: 50;
-
-      /* Liquid Glass Layering */
-      background: radial-gradient(
-        130% 100% at 100% 0%,
-        rgba(255, 255, 255, 0.6) 0%,
-        rgba(255, 255, 255, 0.22) 40%,
-        rgba(255, 255, 255, 0.08) 100%
-      );
-      backdrop-filter: blur(28px) saturate(190%) contrast(105%);
-      -webkit-backdrop-filter: blur(28px) saturate(190%) contrast(105%);
-      
-      /* Refraction & Specular Bevel Highlights */
-      border: 1px solid rgba(255, 255, 255, 0.8);
-      box-shadow: 
-        inset 1px 1px 2px 0px rgba(255, 255, 255, 0.9),
-        inset -1px -1px 3px 0px rgba(255, 255, 255, 0.3),
-        inset 0 20px 40px -15px rgba(255, 255, 255, 0.6),
-        0 20px 40px rgba(0, 0, 0, 0.08),
-        0 1px 3px rgba(0, 0, 0, 0.04);
-
-      transform: translateX(calc(100% + 30px));
-      transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-      display: flex;
-      flex-direction: column;
-      padding: 3rem 2.8rem;
-    }
-
-    .liquid-sidebar.active {
-      transform: translateX(0);
-    }
-
-    .close-btn {
-      align-self: flex-end;
-      background: rgba(255, 255, 255, 0.45);
-      border: 1px solid rgba(255, 255, 255, 0.85);
-      box-shadow: inset 0 1px 2px rgba(255, 255, 255, 0.9), 0 4px 10px rgba(0, 0, 0, 0.04);
-      width: 44px;
-      height: 44px;
-      border-radius: 50%;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      color: var(--text-black);
-      transition: all 0.3s ease;
-    }
-
-    .close-btn:hover {
-      background: rgba(255, 255, 255, 0.8);
-      transform: scale(1.05);
-    }
-
-    .sidebar-content {
-      margin-top: 3.5rem;
-      display: flex;
-      flex-direction: column;
-      height: 100%;
-      justify-content: space-between;
-    }
-
-    .nav-links {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 1.6rem;
-    }
-
-    .nav-links a {
-      text-decoration: none;
-      font-family: var(--font-playfair);
-      font-size: 2.1rem;
-      font-weight: 400;
-      color: var(--text-black);
-      display: inline-block;
-      transition: transform 0.3s ease, letter-spacing 0.3s ease;
-    }
-
-    .nav-links a:hover {
-      transform: translateX(8px);
-      letter-spacing: 0.02em;
-    }
-
-    .nav-links span {
-      font-family: var(--font-clash);
-      font-size: 0.75rem;
-      font-weight: 600;
-      margin-right: 0.8rem;
-      opacity: 0.4;
-      vertical-align: middle;
-    }
-
-    .sidebar-footer {
-      font-family: var(--font-clash);
-      font-size: 0.85rem;
-      line-height: 1.6;
-      color: white;
-    }
-
-    @media (max-width: 768px) {
-      .hero-bg {
-        background-image: url('wallphone.png');
-        background-position: center center;
-      }
-
-      .hero {
-        padding: max(1.25rem, env(safe-area-inset-top)) max(1rem, env(safe-area-inset-right)) max(1.25rem, env(safe-area-inset-bottom)) max(1rem, env(safe-area-inset-left));
-      }
-
-      .brand-title {
-        font-size: clamp(1.05rem, 5vw, 1.35rem);
-      }
-
-      .brand-sub {
-        font-size: clamp(0.68rem, 3vw, 0.82rem);
-      }
-
-      .menu-toggle {
-        gap: 0.55rem;
-        padding: 8px 0 8px 8px;
-      }
-
-      .menu-toggle > span {
-        font-size: 0.72rem;
-      }
-
-      .editorial-content {
-        top: 23%;
-        width: min(100% - 2rem, 34rem);
-      }
-
-      .eyebrow {
-        font-size: 0.68rem;
-        letter-spacing: 0.2em;
-        margin-bottom: 0.85rem;
-      }
-
-      .main-heading {
-        font-size: clamp(2.35rem, 11vw, 4.6rem);
-        line-height: 1.02;
-        margin-bottom: 1rem;
-      }
-
-      .lead-description {
-        font-size: clamp(0.9rem, 3.8vw, 1.05rem);
-        line-height: 1.45;
-      }
-
-      .hero-footer {
-        gap: 1rem;
-        font-size: 0.58rem;
-        letter-spacing: 0.08em;
-      }
-
-      .hero-footer div:last-child {
-        text-align: right;
-      }
-
-      .liquid-sidebar {
-        top: 8px;
-        right: 8px;
-        bottom: 8px;
-        width: min(420px, calc(100vw - 16px));
-        padding: 1.5rem;
-        border-radius: 24px;
-      }
-
-      .sidebar-content {
-        margin-top: 2rem;
-      }
-
-      .nav-links {
-        gap: 1.15rem;
-      }
-
-      .nav-links a {
-        font-size: clamp(1.65rem, 8vw, 2.1rem);
-      }
-    }
-
-    @media (max-width: 480px) {
-      .editorial-content {
-        top: 20%;
-      }
-
-      .hero-footer {
-        align-items: flex-start;
-        flex-direction: column;
-        gap: 0.35rem;
-      }
-
-      .hero-footer div:last-child {
-        text-align: left;
-      }
-
-      .sidebar-footer {
-        font-size: 0.75rem;
-      }
-    }
-
-  </style>
+        @media (max-width: 900px) {
+            .hero-group {
+                top: 4.5rem;
+                left: 1.5rem;
+                transform: rotate(-1.5deg);
+            }
+            .hero-title {
+                font-size: clamp(3.8rem, 16vw, 6.5rem);
+            }
+            .hero-description {
+                font-size: 0.85rem;
+                margin-top: 1rem;
+            }
+            .rover-frame {
+                bottom: 2rem;
+                right: 1.5rem;
+                width: min(85vw, 22rem);
+                transform: rotate(2deg);
+                padding: 0.75rem;
+            }
+        }
+    </style>
 </head>
 <body>
+    <div class="overlay-vignette"></div>
+    <canvas id="grid"></canvas>
 
-  <!-- Liquid Glass Sidebar Overlay -->
-  <div class="sidebar-overlay" id="overlay"></div>
-
-  <!-- Liquid Glass Sidebar Panel -->
-  <aside class="liquid-sidebar" id="sidebar" aria-hidden="true">
-    <button class="close-btn" id="closeBtn" aria-label="Close Menu">&times;</button>
-    <div class="sidebar-content">
-      <nav>
-        <ul class="nav-links">
-          <li><a href="index.html"><span>01</span>Home</a></li>
-          <li><a href="courses.html"><span>02</span>Courses</a></li>
-          <li><a href="#flora"><span>03</span>News</a></li>
-          <li><a href="#exhibition"><span>04</span>Software</a></li>
-          <li><a href="#contact"><span>05</span>About Us</a></li>
-        </ul>
-      </nav>
-      <div class="sidebar-footer">
-        <p><strong>Silence of the Ridge</strong></p>
-        <p>A natural study in high-key serenity & undulating velvet terrain.</p>
-      </div>
-    </div>
-  </aside>
-
-  <div class="hero-wrapper" id="heroWrapper">
-    <!-- Parallax Wallpaper Layer -->
-    <div class="hero-bg" id="heroBg"></div>
-
-    <!-- UI & Foreground Elements -->
-    <main class="hero">
-      <header class="top-bar">
-        <a href="#" class="brand">
-          <span class="brand-title">DART</span>
-          <span class="brand-sub">Built Different.</span>
-        </a>
-
-        <button class="menu-toggle" id="openBtn" aria-label="Open Menu">
-          <span>Index</span>
-          <div class="menu-bars">
+    <!-- Menu Toggle with 2 Uneven Rotating Circles -->
+    <div class="menu-wrapper">
+        <div class="orbitals" aria-hidden="true"></div>
+        <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
             <span></span>
-            <span></span>
-          </div>
         </button>
-      </header>
+    </div>
 
-      <!-- Centerpiece Content -->
-      <section class="editorial-content" id="heroText">
-        <div class="eyebrow">D.A.R.T</div>
-        <h1 class="main-heading">Disaster <em>Assessment</em> & Response Technology.</h1>
-        <p class="lead-description">
-          Signal drops, we don't. We’re built different.
-        </p>
-      </section>
+    <!-- Sidebar Drawer -->
+    <aside class="side-menu" aria-hidden="true">
+        <button class="nav-btn" data-page="HOME"><span>HOME</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="COURSES"><span>COURSES</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="NEWS"><span>NEWS</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="ABOUT US"><span>ABOUT US</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="SOFTWARE"><span>SOFTWARE</span><span class="arrow">→</span></button>
+    </aside>
 
-      <footer class="hero-footer">
-        <div>Elevation &bull; 1,420 m</div>
-        <div>64°08'43.2"N 21°55'41.5"W</div>
-      </footer>
-    </main>
-  </div>
+    <!-- Work In Progress Notice -->
+    <div class="alert-banner" id="wipBanner">
+        <span class="tag">NOTICE:</span>
+        <span id="bannerText">PAGE IS CURRENTLY A WORK IN PROGRESS</span>
+    </div>
 
-  <script>
-    // --- Sidebar Controls ---
-    const openBtn = document.getElementById('openBtn');
-    const closeBtn = document.getElementById('closeBtn');
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
+    <!-- Asymmetric Editorial Layout -->
+    <div class="editorial-stage">
+        <div class="hero-group">
+            <h1 class="hero-title">TRACE</h1>
+            <p class="hero-description">
+                Tactical Reconnaissance and Assessment for Critical Environments.
+            </p>
+        </div>
+        
+        <div class="rover-frame">
+            <div class="bracket tl"></div>
+            <div class="bracket tr"></div>
+            <div class="bracket bl"></div>
+            <div class="bracket br"></div>
+            <img src="image.png" alt="Rover" onerror="this.alt='Rover image (image.png not found)'">
+        </div>
+    </div>
 
-    function openSidebar() {
-      sidebar.classList.add('active');
-      overlay.classList.add('active');
-      sidebar.setAttribute('aria-hidden', 'false');
-    }
+    <!-- Liquid SVG Filter -->
+    <svg width="0" height="0" style="position: absolute;">
+        <defs>
+            <filter id="liquid-filter">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+                <feColorMatrix in="blur" mode="matrix"
+                    values="1 0 0 0 0
+                            0 1 0 0 0
+                            0 0 1 0 0
+                            0 0 0 24 -10" result="liquid" />
+                <feComposite in="SourceGraphic" in2="liquid" operator="atop" />
+            </filter>
+        </defs>
+    </svg>
 
-    function closeSidebar() {
-      sidebar.classList.remove('active');
-      overlay.classList.remove('active');
-      sidebar.setAttribute('aria-hidden', 'true');
-    }
+    <!-- Liquid Flow Cursor -->
+    <div class="liquid-layer" id="liquidLayer">
+        <div class="liquid-core" id="liquidCore"></div>
+    </div>
 
-    openBtn.addEventListener('click', openSidebar);
-    closeBtn.addEventListener('click', closeSidebar);
-    overlay.addEventListener('click', closeSidebar);
+    <script>
+        /* 1. Cursor Tracking */
+        let mouseX = window.innerWidth / 2;
+        let mouseY = window.innerHeight / 2;
+        let coreX = mouseX;
+        let coreY = mouseY;
+        let lastMouseX = mouseX;
+        let lastMouseY = mouseY;
 
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && sidebar.classList.contains('active')) {
-        closeSidebar();
-      }
-    });
+        window.addEventListener('pointermove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
 
-    // --- Smooth Mouse Parallax Physics (Linear Interpolation) ---
-    const heroBg = document.getElementById('heroBg');
-    const heroText = document.getElementById('heroText');
-    const canParallax = !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        /* 2. Liquid Flow Cursor */
+        const liquidLayer = document.getElementById('liquidLayer');
+        const liquidCore = document.getElementById('liquidCore');
+        const trailCount = 8;
+        const trailNodes = [];
 
-    let targetMouseX = 0;
-    let targetMouseY = 0;
-    let currentX = 0;
-    let currentY = 0;
+        for (let i = 0; i < trailCount; i++) {
+            const drop = document.createElement('div');
+            drop.className = 'liquid-drop';
+            const size = 36 - i * 3.5;
+            drop.style.width = `${size}px`;
+            drop.style.height = `${size}px`;
+            liquidLayer.appendChild(drop);
 
-    // Dampening factor (lower = smoother/silkier inertia)
-    const lerpFactor = 0.055;
+            trailNodes.push({
+                element: drop,
+                x: mouseX,
+                y: mouseY
+            });
+        }
 
-    // Movement multipliers (in pixels)
-    const bgMoveIntensity = 28;    // Max pixels wallpaper shifts
-    const textMoveIntensity = 14;  // Max pixels text floats opposite
+        function animateCursor() {
+            const dx = mouseX - lastMouseX;
+            const dy = mouseY - lastMouseY;
+            const speed = Math.hypot(dx, dy);
+            lastMouseX = mouseX;
+            lastMouseY = mouseY;
 
-    if (canParallax) {
-      window.addEventListener('pointermove', (e) => {
-        // Normalize cursor coordinates from center: -1.0 to +1.0
-        const halfWidth = window.innerWidth / 2;
-        const halfHeight = window.innerHeight / 2;
+            coreX += (mouseX - coreX) * 0.25;
+            coreY += (mouseY - coreY) * 0.25;
 
-        targetMouseX = (e.clientX - halfWidth) / halfWidth;
-        targetMouseY = (e.clientY - halfHeight) / halfHeight;
-      });
+            const angle = Math.atan2(dy, dx);
+            const stretch = Math.min(speed * 0.035, 0.7);
+            const scaleX = 1 + stretch;
+            const scaleY = Math.max(0.65, 1 - stretch * 0.5);
 
-      window.addEventListener('pointerleave', () => {
-        targetMouseX = 0;
-        targetMouseY = 0;
-      });
-    }
+            liquidCore.style.transform = `translate3d(${coreX}px, ${coreY}px, 0) translate(-50%, -50%) rotate(${angle}rad) scale(${scaleX}, ${scaleY})`;
 
-    function animateParallax() {
-      // Lerp calculations
-      currentX += (targetMouseX - currentX) * lerpFactor;
-      currentY += (targetMouseY - currentY) * lerpFactor;
+            let prevX = coreX;
+            let prevY = coreY;
 
-      // 1. Move Background (following the camera glance)
-      const bgX = currentX * bgMoveIntensity;
-      const bgY = currentY * bgMoveIntensity;
-      heroBg.style.setProperty('--bg-x', `${bgX}px`);
-      heroBg.style.setProperty('--bg-y', `${bgY}px`);
+            trailNodes.forEach((node, index) => {
+                const followRate = 0.38 - (index * 0.03);
+                node.x += (prevX - node.x) * followRate;
+                node.y += (prevY - node.y) * followRate;
+                node.element.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) translate(-50%, -50%)`;
+                prevX = node.x;
+                prevY = node.y;
+            });
 
-      // 2. Move Text slightly in the counter direction for layered 3D depth
-      const textX = -currentX * textMoveIntensity;
-      const textY = -currentY * textMoveIntensity;
-      heroText.style.setProperty('--text-x', `${textX}px`);
-      heroText.style.setProperty('--text-y', `${textY}px`);
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
 
-      requestAnimationFrame(animateParallax);
-    }
+        /* 3. Topographic Grid */
+        const canvas = document.getElementById('grid');
+        const ctx = canvas.getContext('2d');
+        const spacing = 84;
+        let time = 0;
 
-    // Start animation loop
-    animateParallax();
-  </script>
+        function resize() {
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = window.innerWidth * dpr;
+            canvas.height = window.innerHeight * dpr;
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        window.addEventListener('resize', resize);
+        resize();
+
+        function drawGrid() {
+            const width = window.innerWidth;
+            const height = window.innerHeight;
+
+            ctx.clearRect(0, 0, width, height);
+            ctx.lineWidth = 0.85;
+            ctx.strokeStyle = 'rgba(20, 20, 20, 0.3)';
+
+            const influenceRadius = 110;
+            const displacementForce = 5;
+
+            // Vertical Lines
+            for (let baseX = -spacing; baseX <= width + spacing; baseX += spacing) {
+                ctx.beginPath();
+                for (let y = -spacing; y <= height + spacing; y += 6) {
+                    const wave = Math.sin(y * 0.007 + baseX * 0.01 + time * 0.35) * 15;
+
+                    const distX = baseX - mouseX;
+                    const distY = y - mouseY;
+                    const distance = Math.hypot(distX, distY);
+                    let cursorDistortion = 0;
+
+                    if (distance < influenceRadius) {
+                        const falloff = 1 - distance / influenceRadius;
+                        cursorDistortion = Math.sin(distance * 0.04 - time * 1.5) * displacementForce * falloff;
+                    }
+
+                    const x = baseX + wave + cursorDistortion;
+                    if (y === -spacing) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            // Horizontal Lines
+            for (let baseY = -spacing; baseY <= height + spacing; baseY += spacing) {
+                ctx.beginPath();
+                for (let x = -spacing; x <= width + spacing; x += 6) {
+                    const wave = Math.sin(x * 0.007 + baseY * 0.01 + time * 0.35) * 15;
+
+                    const distX = x - mouseX;
+                    const distY = baseY - mouseY;
+                    const distance = Math.hypot(distX, distY);
+                    let cursorDistortion = 0;
+
+                    if (distance < influenceRadius) {
+                        const falloff = 1 - distance / influenceRadius;
+                        cursorDistortion = Math.sin(distance * 0.04 - time * 1.5) * displacementForce * falloff;
+                    }
+
+                    const y = baseY + wave + cursorDistortion;
+                    if (x === -spacing) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }
+
+            time += 0.004;
+            requestAnimationFrame(drawGrid);
+        }
+        drawGrid();
+
+        /* 4. Sidebar Toggle */
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sideMenu = document.querySelector('.side-menu');
+
+        menuToggle.addEventListener('click', () => {
+            const isOpen = sideMenu.classList.toggle('is-open');
+            menuToggle.classList.toggle('is-open', isOpen);
+            menuToggle.setAttribute('aria-expanded', isOpen);
+            sideMenu.setAttribute('aria-hidden', !isOpen);
+        });
+
+        /* 5. WIP Alert Handling */
+        const wipBanner = document.getElementById('wipBanner');
+        const bannerText = document.getElementById('bannerText');
+        let bannerTimeout = null;
+
+        document.querySelectorAll('.nav-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const page = btn.dataset.page;
+                bannerText.textContent = `[${page}] IS STILL A WORK IN PROGRESS`;
+                wipBanner.classList.add('active');
+
+                if (bannerTimeout) clearTimeout(bannerTimeout);
+                bannerTimeout = setTimeout(() => {
+                    wipBanner.classList.remove('active');
+                }, 2800);
+            });
+        });
+    </script>
 </body>
 </html>
