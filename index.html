@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>TRACE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TRACE (01)</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;600;700;800&display=swap" rel="stylesheet">
@@ -13,66 +13,91 @@
             user-select: none;
         }
         :root {
-            --bg-base: #dcdcd9;
-            --ink-main: #111111;
-            --ink-muted: #4a4a46;
-            --accent-tactical: #bb3425;
+            --bg-base: #eceae5;
+            --ink-main: #0c0d0e;
+            --ink-muted: #62635f;
+            --accent-tactical: #989691;
             --font-mono: 'Martian Mono', monospace;
+            --title-tilt: -1.5deg;
+            --rover-tilt: 2.2deg;
         }
         html, body {
             margin: 0;
             padding: 0;
             width: 100%;
-            height: 100%;
-            overflow: hidden;
+            min-height: 100%;
+            overflow-x: hidden;
+            overflow-y: auto;
             background-color: var(--bg-base);
             font-family: var(--font-mono);
             color: var(--ink-main);
-            cursor: none;
+            cursor: auto;
+            scrollbar-color: var(--accent-tactical) transparent;
+            scrollbar-width: thin;
         }
 
-        /* Subtle vignette */
+        .hero-section {
+            position: relative;
+            width: 100%;
+            height: 100dvh;
+            overflow: hidden;
+            background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(0,0,0,0.02));
+        }
+
         .overlay-vignette {
-            position: fixed;
+            position: absolute;
             inset: 0;
             pointer-events: none;
             z-index: 10;
-            box-shadow: inset 0 0 140px rgba(0, 0, 0, 0.08);
-            background: radial-gradient(circle at center, transparent 60%, rgba(0, 0, 0, 0.07) 100%);
+            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.05);
         }
 
-        /* Canvas Grid */
         #grid {
-            position: fixed;
+            position: absolute;
             inset: 0;
-            width: 100vw;
-            height: 100vh;
+            width: 100%;
+            height: 100%;
             display: block;
             z-index: 1;
         }
 
-        /* Asymmetric Editorial Hero Layout */
         .editorial-stage {
-            position: fixed;
+            position: absolute;
             inset: 0;
             z-index: 15;
             pointer-events: none;
         }
 
-        /* Unified Title + Subtitle Block sharing the same rotation */
+        /* Technical glyph/status marker */
+        .system-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.25rem 0.6rem;
+            border: 1px solid rgba(17, 17, 17, 0.2);
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(4px);
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+        }
+
         .hero-group {
             position: absolute;
-            top: clamp(6rem, 18vh, 13rem);
-            left: clamp(2rem, 6vw, 7rem);
-            max-width: min(90vw, 46rem);
-            transform: rotate(-2.5deg);
+            top: clamp(4.5rem, 14dvh, 10rem);
+            left: clamp(1.25rem, 6vw, 7rem);
+            width: min(58vw, 46rem);
+            max-width: calc(100vw - 3rem);
+            transform: rotate(var(--title-tilt));
             transform-origin: left top;
             pointer-events: none;
         }
 
         .hero-title {
             margin: 0;
-            font-size: clamp(5.5rem, 16vw, 13.5rem);
+            font-size: clamp(3.2rem, 11vw, 13.5rem);
             line-height: 0.82;
             font-weight: 800;
             letter-spacing: -0.06em;
@@ -80,42 +105,49 @@
         }
 
         .hero-description {
-            margin: 1.8rem 0 0 0.4rem;
-            max-width: 34rem;
+            margin: 1.5rem 0 0 0.2rem;
+            max-width: 32rem;
+            width: 100%;
             color: var(--ink-muted);
-            font-size: clamp(0.95rem, 1.45vw, 1.2rem);
+            font-size: clamp(0.78rem, 1.1vw, 1rem);
             line-height: 1.6;
-            font-weight: 600;
-            letter-spacing: -0.01em;
+            font-weight: 500;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
         }
 
-        /* Rover Frame: Shifted further down, transparent background, and image fits wholly */
+        /* Rover Frame */
         .rover-frame {
             position: absolute;
-            bottom: clamp(1.5rem, 5vh, 4rem);
-            right: clamp(2rem, 7vw, 9rem);
-            width: clamp(24rem, 50vw, 44rem);
+            bottom: clamp(2rem, 6dvh, 4rem);
+            right: clamp(1.25rem, 6vw, 9rem);
+            width: min(40vw, 42rem);
+            min-width: 14rem;
             aspect-ratio: 16 / 10;
-            background: transparent; /* Allows transparency & canvas grid behind it */
-            border: 1px dashed rgba(17, 17, 17, 0.35);
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(10px);
+            border: 1px dashed rgba(17, 17, 17, 0.25);
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0.65rem;
-            transform: rotate(3.2deg);
+            padding: 0.85rem;
+            transform: rotate(var(--rover-tilt));
             pointer-events: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
         }
         .rover-frame img {
             width: 100%;
             height: 100%;
-            object-fit: contain; /* Shows full image without cropping */
+            object-fit: contain;
             display: block;
-            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.15));
+            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.12));
         }
+
+        /* Technical Corners */
         .rover-frame .bracket {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 8px;
+            height: 8px;
             border-color: var(--ink-main);
             pointer-events: none;
         }
@@ -124,13 +156,64 @@
         .bracket.bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; }
         .bracket.br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; }
 
-        /* Menu Button with Uneven Rotating Orbitals */
+        .frame-label {
+            position: absolute;
+            bottom: -1.4rem;
+            right: 0;
+            font-size: 0.62rem;
+            letter-spacing: 0.14em;
+            color: var(--ink-muted);
+            font-weight: 700;
+        }
+
+        /* What We Do Section */
+        .about-section {
+            position: relative;
+            z-index: 20;
+            width: 100%;
+            background-color: var(--bg-base);
+            border-top: 1px solid rgba(17, 17, 17, 0.15);
+            padding: clamp(3.5rem, 8vw, 6rem) clamp(1.5rem, 6vw, 7rem);
+        }
+        .about-inner {
+            max-width: 76rem;
+            width: 100%;
+        }
+        .about-label {
+            display: block;
+            font-size: clamp(0.72rem, 0.9vw, 0.82rem);
+            font-weight: 800;
+            letter-spacing: 0.18em;
+            color: var(--ink-main);
+            margin-bottom: 0.9rem;
+            text-transform: uppercase;
+            opacity: 0.8;
+        }
+        .about-title {
+            margin: 0 0 1.3rem;
+            font-size: clamp(2.4rem, 5.2vw, 5.4rem);
+            line-height: 0.9;
+            letter-spacing: -0.06em;
+            font-weight: 800;
+            color: var(--ink-main);
+        }
+        .about-copy {
+            margin: 0;
+            width: min(100%, 64rem);
+            font-size: clamp(1.05rem, 1.7vw, 1.4rem);
+            line-height: 1.75;
+            font-weight: 400;
+            letter-spacing: -0.02em;
+            color: var(--ink-main);
+        }
+
+        /* Menu Button */
         .menu-wrapper {
             position: fixed;
-            top: 2rem;
-            right: 2rem;
-            width: 4.2rem;
-            height: 4.2rem;
+            top: calc(1.5rem + env(safe-area-inset-top, 0px));
+            right: calc(1.5rem + env(safe-area-inset-right, 0px));
+            width: 3.5rem;
+            height: 3.5rem;
             z-index: 60;
             display: grid;
             place-items: center;
@@ -144,48 +227,49 @@
         .orbitals::after {
             content: '';
             position: absolute;
-            border: 1.5px solid rgba(17, 17, 17, 0.45);
+            border: 1px dashed rgba(17, 17, 17, 0.35);
         }
         .orbitals::before {
             inset: -4px;
-            border-radius: 56% 44% 63% 37% / 42% 58% 42% 58%;
-            animation: spinRingOne 14s linear infinite;
+            border-radius: 50%;
+            animation: spinRingOne 20s linear infinite;
         }
         .orbitals::after {
-            inset: 3px;
-            border-color: var(--accent-tactical);
-            border-radius: 41% 59% 47% 53% / 59% 39% 61% 41%;
-            animation: spinRingTwo 9s linear infinite reverse;
+            inset: 2px;
+            border-color: var(--ink-main);
+            border-style: solid;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: spinRingTwo 12s linear infinite reverse;
         }
         @keyframes spinRingOne {
-            0% { transform: rotate(0deg) scaleY(0.7); }
-            100% { transform: rotate(360deg) scaleY(0.7); }
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         @keyframes spinRingTwo {
-            0% { transform: rotate(360deg) scaleY(0.85); }
-            100% { transform: rotate(0deg) scaleY(0.85); }
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
         }
 
         .menu-toggle {
             position: relative;
             z-index: 2;
-            width: 2.8rem;
-            height: 2.8rem;
-            background: rgba(220, 220, 217, 0.85);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(17, 17, 17, 0.3);
+            width: 2.4rem;
+            height: 2.4rem;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(17, 17, 17, 0.25);
+            backdrop-filter: blur(8px);
             cursor: pointer;
             display: grid;
             place-items: center;
             padding: 0;
-            transition: all 0.25s ease;
+            transition: all 0.2s ease;
         }
         .menu-toggle:hover {
-            border-color: var(--accent-tactical);
-            background: rgba(220, 220, 217, 1);
+            border-color: var(--ink-main);
         }
         .menu-toggle span {
-            width: 1.1rem;
+            width: 1rem;
             height: 2px;
             background: var(--ink-main);
             position: relative;
@@ -199,40 +283,40 @@
             width: 100%;
             height: 2px;
             background: var(--ink-main);
-            transition: transform 0.25s ease;
+            transition: transform 0.2s ease;
         }
-        .menu-toggle span::before { top: -6px; }
-        .menu-toggle span::after { top: 6px; }
+        .menu-toggle span::before { top: -5px; }
+        .menu-toggle span::after { top: 5px; }
 
         .menu-toggle.is-open span {
             background: transparent;
         }
         .menu-toggle.is-open span::before {
-            transform: translateY(6px) rotate(45deg);
-            background: var(--accent-tactical);
+            transform: translateY(5px) rotate(45deg);
+            background: var(--ink-main);
         }
         .menu-toggle.is-open span::after {
-            transform: translateY(-6px) rotate(-45deg);
-            background: var(--accent-tactical);
+            transform: translateY(-5px) rotate(-45deg);
+            background: var(--ink-main);
         }
 
-        /* Sidebar Navigation Drawer */
+        /* Sidebar Navigation */
         .side-menu {
             position: fixed;
             top: 0;
             right: 0;
             width: min(85vw, 22rem);
             height: 100vh;
-            padding: 7rem 2.5rem 3rem;
-            background: rgba(225, 225, 221, 0.95);
-            backdrop-filter: blur(14px);
-            border-left: 1px solid rgba(17, 17, 17, 0.2);
+            padding: 6.5rem 2.2rem 3rem;
+            background: rgba(236, 234, 229, 0.94);
+            backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(17, 17, 17, 0.15);
             z-index: 55;
             transform: translateX(100%);
-            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
             display: flex;
             flex-direction: column;
-            gap: 1.4rem;
+            gap: 1.2rem;
         }
         .side-menu.is-open {
             transform: translateX(0);
@@ -240,11 +324,11 @@
         .nav-btn {
             background: none;
             border: none;
-            border-bottom: 1px dashed rgba(17, 17, 17, 0.25);
+            border-bottom: 1px solid rgba(17, 17, 17, 0.2);
             padding: 0.8rem 0;
             text-align: left;
             font-family: var(--font-mono);
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             font-weight: 700;
             letter-spacing: 0.08em;
             color: var(--ink-main);
@@ -255,38 +339,38 @@
             transition: all 0.2s ease;
         }
         .nav-btn:hover {
-            color: var(--accent-tactical);
-            padding-left: 0.5rem;
-            border-bottom-color: var(--accent-tactical);
+            color: var(--ink-muted);
+            padding-left: 0.4rem;
+            border-bottom-color: var(--ink-main);
         }
         .nav-btn span.arrow {
             font-size: 0.8rem;
-            opacity: 0.5;
-            transition: transform 0.2s;
+            opacity: 0.4;
         }
         .nav-btn:hover span.arrow {
-            transform: translateX(4px);
+            transform: translateX(3px);
             opacity: 1;
         }
 
-        /* Work In Progress Alert Banner */
+        /* WIP Alert Banner */
         .alert-banner {
             position: fixed;
-            top: 2rem;
+            top: 1.5rem;
             left: 50%;
-            transform: translateX(-50%) translateY(-30px);
+            transform: translateX(-50%) translateY(-25px);
             opacity: 0;
             pointer-events: none;
             z-index: 80;
-            background: #111111;
+            background: #0f1011;
             color: #ffffff;
-            padding: 0.85rem 1.6rem;
-            border-left: 4px solid var(--accent-tactical);
-            font-size: 0.75rem;
+            padding: 0.65rem 1.4rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 3px solid var(--accent-tactical);
+            font-size: 0.72rem;
             font-weight: 600;
             letter-spacing: 0.08em;
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            transition: all 0.25s ease;
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
             white-space: nowrap;
         }
         .alert-banner.active {
@@ -296,7 +380,7 @@
         .alert-banner .tag {
             color: var(--accent-tactical);
             font-weight: 800;
-            margin-right: 0.6rem;
+            margin-right: 0.5rem;
         }
 
         /* Liquid Cursor */
@@ -312,7 +396,7 @@
             top: 0;
             left: 0;
             border-radius: 50%;
-            background: #111111;
+            background: #000000;
             transform: translate(-50%, -50%);
             will-change: transform;
         }
@@ -320,42 +404,109 @@
             position: absolute;
             top: 0;
             left: 0;
-            width: 44px;
-            height: 44px;
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
-            background: #111111;
+            background: #000000;
             transform: translate(-50%, -50%);
             will-change: transform;
         }
 
         @media (max-width: 900px) {
+            :root {
+                --title-tilt: 0deg;
+                --rover-tilt: 0deg;
+            }
             .hero-group {
-                top: 4.5rem;
+                top: 6.5rem;
                 left: 1.5rem;
-                transform: rotate(-1.5deg);
+                width: min(70vw, 32rem);
             }
             .hero-title {
-                font-size: clamp(3.8rem, 16vw, 6.5rem);
-            }
-            .hero-description {
-                font-size: 0.85rem;
-                margin-top: 1rem;
+                font-size: clamp(3.2rem, 11vw, 6rem);
             }
             .rover-frame {
                 bottom: 2rem;
                 right: 1.5rem;
                 width: min(85vw, 22rem);
-                transform: rotate(2deg);
-                padding: 0.75rem;
+            }
+        }
+
+        @media (max-width: 560px) {
+            .editorial-stage {
+                display: flex;
+                flex-direction: column;
+                justify-content: flex-start;
+                gap: 1.5rem;
+                padding: calc(4.8rem + env(safe-area-inset-top, 0px)) 1.25rem 2rem;
+                inset: 0;
+                position: absolute;
+                overflow-y: hidden;
+            }
+            .hero-group {
+                position: static;
+                width: 100%;
+                max-width: 100%;
+                transform: none;
+            }
+            .hero-title {
+                font-size: clamp(2.8rem, 14vw, 4.4rem);
+                line-height: 0.9;
+            }
+            .hero-description {
+                margin: 0.8rem 0 0 0;
+                font-size: 0.78rem;
+                line-height: 1.5;
+            }
+            .rover-frame {
+                position: static;
+                width: 100%;
+                max-width: 20rem;
+                margin: 0 auto;
+                transform: none;
             }
         }
     </style>
 </head>
 <body>
-    <div class="overlay-vignette"></div>
-    <canvas id="grid"></canvas>
+    <section class="hero-section">
+        <div class="overlay-vignette"></div>
+        <canvas id="grid"></canvas>
 
-    <!-- Menu Toggle with 2 Uneven Rotating Circles -->
+        <div class="editorial-stage">
+            <div class="hero-group">
+                <div class="system-pill">
+                    <span>SYS.01 // RECON</span>
+                </div>
+                <h1 class="hero-title">TRACE</h1>
+                <p class="hero-description">
+                    Tactical Reconnaissance and Assessment for Critical Environments.
+                </p>
+            </div>
+
+            <div class="rover-frame">
+                <div class="bracket tl"></div>
+                <div class="bracket tr"></div>
+                <div class="bracket bl"></div>
+                <div class="bracket br"></div>
+                <img src="image.png" alt="Rover Unit" onerror="this.alt='[UNIT_ASSET_UNAVAILABLE]'">
+                <span class="frame-label">FIG 1.0 — FIELD ROVER</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- What We Do -->
+    <section class="about-section">
+        <div class="about-inner">
+            <span class="about-label">WHAT WE DO</span>
+            <h2 class="about-title">Disaster response, mapped in real time.</h2>
+            <p class="about-copy">
+                TRACE is a disaster-response system built around two intelligent rovers designed to enter dangerous or inaccessible areas where human responders may not know where it is safe to go. Equipped with multiple sensors, cameras, and our own low-cost mapping technology, the rovers explore the environment and collect critical data such as terrain conditions and other real-time information. Our custom software processes and combines this data to create a clear picture of the affected area and can be downloaded directly from our website. The collected information is transmitted to our online platform, where civilians and response teams can access real-time disaster updates and situational information.
+            </p>
+        </div>
+    </section>
+
+    <!-- Menu Toggle -->
     <div class="menu-wrapper">
         <div class="orbitals" aria-hidden="true"></div>
         <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
@@ -365,59 +516,40 @@
 
     <!-- Sidebar Drawer -->
     <aside class="side-menu" aria-hidden="true">
-        <button class="nav-btn" data-page="HOME"><span>HOME</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="COURSES"><span>COURSES</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="NEWS"><span>NEWS</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="ABOUT US"><span>ABOUT US</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="SOFTWARE"><span>SOFTWARE</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="HOME" data-href="index.html"><span>(01) HOME</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="COURSES" data-href="courses.html"><span>(02) COURSES</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="NEWS"><span>(03) NEWS</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="ABOUT US"><span>(04) ABOUT US</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="SOFTWARE"><span>(05) SOFTWARE</span><span class="arrow">→</span></button>
     </aside>
 
     <!-- Work In Progress Notice -->
     <div class="alert-banner" id="wipBanner">
-        <span class="tag">NOTICE:</span>
-        <span id="bannerText">PAGE IS CURRENTLY A WORK IN PROGRESS</span>
+        <span class="tag">[LIVE_DEV]</span>
+        <span id="bannerText">MODULE CURRENTLY IN PROGRESS</span>
     </div>
 
-    <!-- Asymmetric Editorial Layout -->
-    <div class="editorial-stage">
-        <div class="hero-group">
-            <h1 class="hero-title">TRACE</h1>
-            <p class="hero-description">
-                Tactical Reconnaissance and Assessment for Critical Environments.
-            </p>
-        </div>
-        
-        <div class="rover-frame">
-            <div class="bracket tl"></div>
-            <div class="bracket tr"></div>
-            <div class="bracket bl"></div>
-            <div class="bracket br"></div>
-            <img src="image.png" alt="Rover" onerror="this.alt='Rover image (image.png not found)'">
-        </div>
-    </div>
-
-    <!-- Liquid SVG Filter -->
+    <!-- Liquid Filter -->
     <svg width="0" height="0" style="position: absolute;">
         <defs>
             <filter id="liquid-filter">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="12" result="blur" />
+                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
                 <feColorMatrix in="blur" mode="matrix"
                     values="1 0 0 0 0
                             0 1 0 0 0
                             0 0 1 0 0
-                            0 0 0 24 -10" result="liquid" />
+                            0 0 0 22 -9" result="liquid" />
                 <feComposite in="SourceGraphic" in2="liquid" operator="atop" />
             </filter>
         </defs>
     </svg>
 
-    <!-- Liquid Flow Cursor -->
     <div class="liquid-layer" id="liquidLayer">
-        <div class="liquid-core" id="liquidCore"></div>
+        <div class="liquidcore" id="liquidCore"></div>
     </div>
 
     <script>
-        /* 1. Cursor Tracking */
+        /* Cursor Tracking */
         let mouseX = window.innerWidth / 2;
         let mouseY = window.innerHeight / 2;
         let coreX = mouseX;
@@ -430,16 +562,16 @@
             mouseY = e.clientY;
         });
 
-        /* 2. Liquid Flow Cursor */
+        /* Liquid Cursor */
         const liquidLayer = document.getElementById('liquidLayer');
         const liquidCore = document.getElementById('liquidCore');
-        const trailCount = 8;
+        const trailCount = 7;
         const trailNodes = [];
 
         for (let i = 0; i < trailCount; i++) {
             const drop = document.createElement('div');
             drop.className = 'liquid-drop';
-            const size = 36 - i * 3.5;
+            const size = 32 - i * 3.5;
             drop.style.width = `${size}px`;
             drop.style.height = `${size}px`;
             liquidLayer.appendChild(drop);
@@ -484,11 +616,18 @@
         }
         animateCursor();
 
-        /* 3. Topographic Grid */
+        /* Topographic Wire Mesh */
         const canvas = document.getElementById('grid');
         const ctx = canvas.getContext('2d');
         const spacing = 84;
         let time = 0;
+        let gridMouseX = mouseX;
+        let gridMouseY = mouseY;
+
+        function lineJitter(seed) {
+            const x = Math.sin(seed * 127.1) * 43758.5453;
+            return x - Math.floor(x);
+        }
 
         function resize() {
             const dpr = window.devicePixelRatio || 1;
@@ -503,53 +642,68 @@
             const width = window.innerWidth;
             const height = window.innerHeight;
 
+            gridMouseX += (mouseX - gridMouseX) * 0.07;
+            gridMouseY += (mouseY - gridMouseY) * 0.07;
+
             ctx.clearRect(0, 0, width, height);
-            ctx.lineWidth = 0.85;
-            ctx.strokeStyle = 'rgba(20, 20, 20, 0.3)';
 
-            const influenceRadius = 110;
-            const displacementForce = 5;
+            const influenceRadius = 240;
+            const displacementForce = 8;
 
-            // Vertical Lines
             for (let baseX = -spacing; baseX <= width + spacing; baseX += spacing) {
+                const seed = baseX * 0.013;
+                const phase = lineJitter(seed) * Math.PI * 2;
+                const ampMul = 0.6 + lineJitter(seed + 4.2) * 0.9;
+                const posOffset = (lineJitter(seed + 9.1) - 0.5) * 14;
+                ctx.lineWidth = 0.5 + lineJitter(seed + 1.7) * 0.5;
+                ctx.strokeStyle = `rgba(18, 18, 18, ${0.11 + lineJitter(seed + 2.3) * 0.12})`;
+
                 ctx.beginPath();
                 for (let y = -spacing; y <= height + spacing; y += 6) {
-                    const wave = Math.sin(y * 0.007 + baseX * 0.01 + time * 0.35) * 15;
+                    const wave = Math.sin(y * 0.007 + baseX * 0.01 + time * 0.35 + phase) * 6 * ampMul
+                        + Math.sin(y * 0.045 + baseX * 0.02 - time * 0.9 + phase) * 2.2;
 
-                    const distX = baseX - mouseX;
-                    const distY = y - mouseY;
+                    const distX = baseX - gridMouseX;
+                    const distY = y - gridMouseY;
                     const distance = Math.hypot(distX, distY);
                     let cursorDistortion = 0;
 
                     if (distance < influenceRadius) {
                         const falloff = 1 - distance / influenceRadius;
-                        cursorDistortion = Math.sin(distance * 0.04 - time * 1.5) * displacementForce * falloff;
+                        cursorDistortion = Math.sin(distance * 0.03 - time * 1.5) * displacementForce * (falloff * falloff);
                     }
 
-                    const x = baseX + wave + cursorDistortion;
+                    const x = baseX + posOffset + wave + cursorDistortion;
                     if (y === -spacing) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
                 ctx.stroke();
             }
 
-            // Horizontal Lines
             for (let baseY = -spacing; baseY <= height + spacing; baseY += spacing) {
+                const seed = baseY * 0.017 + 500;
+                const phase = lineJitter(seed) * Math.PI * 2;
+                const ampMul = 0.6 + lineJitter(seed + 4.2) * 0.9;
+                const posOffset = (lineJitter(seed + 9.1) - 0.5) * 14;
+                ctx.lineWidth = 0.5 + lineJitter(seed + 1.7) * 0.5;
+                ctx.strokeStyle = `rgba(18, 18, 18, ${0.11 + lineJitter(seed + 2.3) * 0.12})`;
+
                 ctx.beginPath();
                 for (let x = -spacing; x <= width + spacing; x += 6) {
-                    const wave = Math.sin(x * 0.007 + baseY * 0.01 + time * 0.35) * 15;
+                    const wave = Math.sin(x * 0.007 + baseY * 0.01 + time * 0.35 + phase) * 6 * ampMul
+                        + Math.sin(x * 0.045 + baseY * 0.02 - time * 0.9 + phase) * 2.2;
 
-                    const distX = x - mouseX;
-                    const distY = baseY - mouseY;
+                    const distX = x - gridMouseX;
+                    const distY = baseY - gridMouseY;
                     const distance = Math.hypot(distX, distY);
                     let cursorDistortion = 0;
 
                     if (distance < influenceRadius) {
                         const falloff = 1 - distance / influenceRadius;
-                        cursorDistortion = Math.sin(distance * 0.04 - time * 1.5) * displacementForce * falloff;
+                        cursorDistortion = Math.sin(distance * 0.03 - time * 1.5) * displacementForce * (falloff * falloff);
                     }
 
-                    const y = baseY + wave + cursorDistortion;
+                    const y = baseY + posOffset + wave + cursorDistortion;
                     if (x === -spacing) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }
@@ -561,7 +715,7 @@
         }
         drawGrid();
 
-        /* 4. Sidebar Toggle */
+        /* Sidebar Toggle */
         const menuToggle = document.querySelector('.menu-toggle');
         const sideMenu = document.querySelector('.side-menu');
 
@@ -572,15 +726,21 @@
             sideMenu.setAttribute('aria-hidden', !isOpen);
         });
 
-        /* 5. WIP Alert Handling */
+        /* WIP Alert Notification */
         const wipBanner = document.getElementById('wipBanner');
         const bannerText = document.getElementById('bannerText');
         let bannerTimeout = null;
 
         document.querySelectorAll('.nav-btn').forEach((btn) => {
             btn.addEventListener('click', () => {
+                const href = btn.dataset.href;
+                if (href) {
+                    window.location.href = href;
+                    return;
+                }
+
                 const page = btn.dataset.page;
-                bannerText.textContent = `[${page}] IS STILL A WORK IN PROGRESS`;
+                bannerText.textContent = `SECTION [${page}] IS UNDER DEVELOPMENT`;
                 wipBanner.classList.add('active');
 
                 if (bannerTimeout) clearTimeout(bannerTimeout);

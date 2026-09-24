@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>TRACE // COURSES (02)</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            user-select: none;
+        }
+        :root {
+            --bg-base: #eceae5;
+            --ink-main: #0c0d0e;
+            --ink-muted: #62635f;
+            --accent-tactical: #989691;
+            --font-mono: 'Martian Mono', monospace;
+            --border-light: rgba(17, 17, 17, 0.16);
+        }
+        html, body {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            min-height: 100%;
+            overflow-x: hidden;
+            background-color: var(--bg-base);
+            font-family: var(--font-mono);
+            color: var(--ink-main);
+            cursor: auto;
+            scrollbar-color: var(--accent-tactical) transparent;
+            scrollbar-width: thin;
+        }
+
+        /* Top Nav Header */
+        .site-header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem clamp(1.25rem, 5vw, 4rem);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 50;
+            background: linear-gradient(180deg, rgba(236, 234, 229, 0.95), transparent);
+            pointer-events: none;
+        }
+        .header-brand {
+            pointer-events: auto;
+            text-decoration: none;
+            color: var(--ink-main);
+            font-size: 0.85rem;
+            font-weight: 800;
+            letter-spacing: 0.1em;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .header-brand span {
+            font-size: 0.65rem;
+            color: var(--ink-muted);
+            font-weight: 400;
+        }
+
+        /* Menu Button */
+        .menu-wrapper {
+            position: fixed;
+            top: calc(1.5rem + env(safe-area-inset-top, 0px));
+            right: calc(1.5rem + env(safe-area-inset-right, 0px));
+            width: 3.5rem;
+            height: 3.5rem;
+            z-index: 60;
+            display: grid;
+            place-items: center;
+        }
+        .orbitals {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        .orbitals::before,
+        .orbitals::after {
+            content: '';
+            position: absolute;
+            border: 1px dashed rgba(17, 17, 17, 0.35);
+        }
+        .orbitals::before {
+            inset: -4px;
+            border-radius: 50%;
+            animation: spinRingOne 20s linear infinite;
+        }
+        .orbitals::after {
+            inset: 2px;
+            border-color: var(--ink-main);
+            border-style: solid;
+            border-radius: 50%;
+            opacity: 0.4;
+            animation: spinRingTwo 12s linear infinite reverse;
+        }
+        @keyframes spinRingOne {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes spinRingTwo {
+            0% { transform: rotate(360deg); }
+            100% { transform: rotate(0deg); }
+        }
+
+        .menu-toggle {
+            position: relative;
+            z-index: 2;
+            width: 2.4rem;
+            height: 2.4rem;
+            background: rgba(255, 255, 255, 0.4);
+            border: 1px solid rgba(17, 17, 17, 0.25);
+            backdrop-filter: blur(8px);
+            cursor: pointer;
+            display: grid;
+            place-items: center;
+            padding: 0;
+            transition: all 0.2s ease;
+        }
+        .menu-toggle:hover {
+            border-color: var(--ink-main);
+            background: rgba(255, 255, 255, 0.62);
+        }
+        .menu-toggle span {
+            width: 1.1rem;
+            height: 2px;
+            background: var(--ink-main);
+            position: relative;
+            transition: background-color 0.2s;
+        }
+        .menu-toggle span::before,
+        .menu-toggle span::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: var(--ink-main);
+            transition: transform 0.25s ease;
+        }
+        .menu-toggle span::before { top: -6px; }
+        .menu-toggle span::after { top: 6px; }
+        .menu-toggle.is-open span { background: transparent; }
+        .menu-toggle.is-open span::before {
+            transform: translateY(6px) rotate(45deg);
+            background: var(--ink-main);
+        }
+        .menu-toggle.is-open span::after {
+            transform: translateY(-6px) rotate(-45deg);
+            background: var(--ink-main);
+        }
+
+        .side-menu {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: min(85vw, 22rem);
+            height: 100vh;
+            padding: 7rem 2.5rem 3rem;
+            background: rgba(236, 234, 229, 0.96);
+            backdrop-filter: blur(14px);
+            border-left: 1px solid rgba(17, 17, 17, 0.16);
+            z-index: 55;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1.4rem;
+        }
+        .side-menu.is-open {
+            transform: translateX(0);
+        }
+        .nav-btn {
+            background: none;
+            border: none;
+            border-bottom: 1px dashed rgba(17, 17, 17, 0.25);
+            padding: 0.8rem 0;
+            text-align: left;
+            font-family: var(--font-mono);
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            color: var(--ink-main);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s ease;
+            text-decoration: none;
+        }
+        .nav-btn:hover {
+            color: var(--ink-main);
+            padding-left: 0.5rem;
+            border-bottom-color: rgba(17, 17, 17, 0.5);
+        }
+        .nav-btn span.arrow {
+            font-size: 0.8rem;
+            opacity: 0.5;
+            transition: transform 0.2s;
+        }
+        .nav-btn:hover span.arrow {
+            transform: translateX(4px);
+            opacity: 1;
+        }
+
+        .alert-banner {
+            position: fixed;
+            top: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(-30px);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 80;
+            background: #111111;
+            color: #ffffff;
+            padding: 0.85rem 1.6rem;
+            border-left: 4px solid var(--ink-main);
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            white-space: nowrap;
+        }
+        .alert-banner.active {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .alert-banner .tag {
+            color: #dcd7d1;
+            font-weight: 800;
+            margin-right: 0.6rem;
+        }
+
+        /* Layout Container */
+        .page-container {
+            max-width: 88rem;
+            margin: 0 auto;
+            padding: calc(6rem + env(safe-area-inset-top, 0px)) clamp(1.25rem, 5vw, 4rem) 6rem;
+        }
+
+        /* Page Masthead */
+        .page-header {
+            border-bottom: 1px solid var(--border-light);
+            padding-bottom: 2rem;
+            margin-bottom: 3.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .header-meta {
+            font-size: 0.68rem;
+            letter-spacing: 0.14em;
+            color: var(--ink-muted);
+            text-transform: uppercase;
+        }
+        .header-title-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+        }
+        .page-title {
+            margin: 0;
+            font-size: clamp(2.5rem, 7vw, 6rem);
+            font-weight: 800;
+            letter-spacing: -0.05em;
+            line-height: 0.9;
+        }
+        .header-count {
+            font-size: 0.8rem;
+            color: var(--ink-muted);
+            border: 1px solid var(--border-light);
+            padding: 0.35rem 0.75rem;
+            background: rgba(255, 255, 255, 0.35);
+        }
+
+        /* Asymmetric Niche Bento Grid */
+        .course-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.5rem;
+            align-items: stretch;
+        }
+
+        /* Base Card Styling */
+        .course-card {
+            position: relative;
+            background: rgba(255, 255, 255, 0.35);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--border-light);
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), background-color 0.2s ease, border-color 0.2s ease;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        .course-card:hover {
+            background: rgba(255, 255, 255, 0.65);
+            border-color: var(--ink-main);
+            transform: translateY(-2px);
+        }
+
+        /* Corner crosshairs */
+        .card-corner {
+            position: absolute;
+            width: 7px;
+            height: 7px;
+            color: var(--ink-muted);
+            font-size: 0.65rem;
+            line-height: 1;
+            display: grid;
+            place-items: center;
+            opacity: 0.6;
+        }
+        .corner-tl { top: 4px; left: 4px; }
+        .corner-tr { top: 4px; right: 4px; }
+        .corner-bl { bottom: 4px; left: 4px; }
+        .corner-br { bottom: 4px; right: 4px; }
+
+        /* Card Elements */
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 2.5rem;
+        }
+        .card-id {
+            font-size: 0.65rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            color: var(--ink-muted);
+        }
+        .card-badge {
+            font-size: 0.6rem;
+            padding: 0.2rem 0.5rem;
+            border: 1px solid var(--border-light);
+            background: rgba(236, 234, 229, 0.8);
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .card-title {
+            margin: 0 0 1rem;
+            font-size: clamp(1.2rem, 1.8vw, 1.6rem);
+            font-weight: 800;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+        }
+        .card-desc {
+            margin: 0 0 2rem;
+            font-size: 0.78rem;
+            color: var(--ink-muted);
+            line-height: 1.6;
+            font-weight: 400;
+        }
+
+        .card-bottom {
+            border-top: 1px dashed var(--border-light);
+            padding-top: 1.2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.68rem;
+            font-weight: 600;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+        .card-action {
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: transform 0.2s;
+        }
+        .course-card:hover .card-action {
+            transform: translateX(4px);
+        }
+
+        /* Span Variants for Asymmetry */
+        .span-7 { grid-column: span 7; }
+        .span-5 { grid-column: span 5; }
+        .span-4 { grid-column: span 4; }
+        .span-8 { grid-column: span 8; }
+        .span-12 { grid-column: span 12; }
+
+        /* Featured Large Card styling */
+        .card-featured {
+            background: rgba(16, 17, 18, 0.03);
+            border: 1px solid rgba(16, 17, 18, 0.35);
+        }
+        .card-featured .card-title {
+            font-size: clamp(1.5rem, 2.5vw, 2.3rem);
+        }
+        .card-featured .card-desc {
+            max-width: 44rem;
+        }
+
+        /* Minimal Technical Telemetry Card */
+        .card-telemetry {
+            background: #111213;
+            color: #f0eee9;
+            border-color: #111213;
+        }
+        .card-telemetry .card-id,
+        .card-telemetry .card-desc,
+        .card-telemetry .card-corner {
+            color: #8c8b87;
+        }
+        .card-telemetry .card-badge {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.08);
+            color: #f0eee9;
+        }
+        .card-telemetry .card-bottom {
+            border-top-color: rgba(255, 255, 255, 0.15);
+        }
+        .card-telemetry:hover {
+            background: #191b1c;
+            border-color: #000;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            .span-7, .span-5, .span-4, .span-8 {
+                grid-column: span 6;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .course-grid {
+                grid-template-columns: 1fr;
+            }
+            .span-7, .span-5, .span-4, .span-8, .span-12 {
+                grid-column: span 1;
+            }
+            .page-container {
+                padding-top: 5rem;
+            }
+            .card-top {
+                margin-bottom: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header class="site-header">
+        <a href="index.html" class="header-brand">
+            TRACE <span>[CRSE_MOD]</span>
+        </a>
+    </header>
+
+    <div class="menu-wrapper">
+        <div class="orbitals" aria-hidden="true"></div>
+        <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
+            <span></span>
+        </button>
+    </div>
+
+    <aside class="side-menu" aria-hidden="true">
+        <button class="nav-btn" data-page="HOME" data-href="index.html"><span>(01) HOME</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="COURSES" data-href="courses.html"><span>(02) COURSES</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="NEWS"><span>(03) NEWS</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="ABOUT US"><span>(04) ABOUT US</span><span class="arrow">→</span></button>
+        <button class="nav-btn" data-page="SOFTWARE"><span>(05) SOFTWARE</span><span class="arrow">→</span></button>
+    </aside>
+
+    <div class="alert-banner" id="wipBanner">
+        <span class="tag">[LIVE_DEV]</span>
+        <span id="bannerText">MODULE CURRENTLY IN PROGRESS</span>
+    </div>
+
+    <!-- Page Body -->
+    <main class="page-container">
+        
+        <section class="page-header">
+            <span class="header-meta">// CURRICULUM ARCHIVE — REGISTRY 2026</span>
+            <div class="header-title-row">
+                <h1 class="page-title">COURSES</h1>
+                <div class="header-count">[TOTAL: 05 MODULES]</div>
+            </div>
+        </section>
+
+        <!-- Asymmetric Bento Grid Layout -->
+        <div class="course-grid">
+            
+            <!-- Card 01 (Wide Featured) -->
+            <article class="course-card span-8 card-featured">
+                <span class="card-corner corner-tl">+</span>
+                <span class="card-corner corner-tr">+</span>
+                <span class="card-corner corner-bl">+</span>
+                <span class="card-corner corner-br">+</span>
+                
+                <div class="card-top">
+                    <span class="card-id">MOD.01 // CORE</span>
+                    <span class="card-badge">FOUNDATIONAL</span>
+                </div>
+                <div>
+                    <h2 class="card-title">Autonomous Reconnaissance & Mesh Coordination</h2>
+                    <p class="card-desc">
+                        Learn how multi-rover arrays navigate low-visibility hazard corridors, generate simultaneous SLAM maps, and feed terrain risk telemetry to search-and-rescue command units.
+                    </p>
+                </div>
+                <div class="card-bottom">
+                    <span>DURATION: 04 WEEKS</span>
+                    <span class="card-action">ACCESS [ENTER] →</span>
+                </div>
+            </article>
+
+            <!-- Card 02 (Dark Wireframe Minimal) -->
+            <article class="course-card span-4 card-telemetry">
+                <span class="card-corner corner-tl">+</span>
+                <span class="card-corner corner-tr">+</span>
+                <span class="card-corner corner-bl">+</span>
+                <span class="card-corner corner-br">+</span>
+
+                <div class="card-top">
+                    <span class="card-id">MOD.02 // INTEL</span>
+                    <span class="card-badge">DIFFICULTY: HIGH</span>
+                </div>
+                <div>
+                    <h2 class="card-title">Sensory Array Diagnostics</h2>
+                    <p class="card-desc">
+                        Real-time calibration of infrared, structural acoustic, and atmospheric sensors under extreme dust and smoke degradation.
+                    </p>
+                </div>
+                <div class="card-bottom">
+                    <span>DURATION: 02 WEEKS</span>
+                    <span class="card-action">ACCESS [ENTER] →</span>
+                </div>
+            </article>
+
+            <!-- Card 03 -->
+            <article class="course-card span-4">
+                <span class="card-corner corner-tl">+</span>
+                <span class="card-corner corner-tr">+</span>
+                <span class="card-corner corner-bl">+</span>
+                <span class="card-corner corner-br">+</span>
+
+                <div class="card-top">
+                    <span class="card-id">MOD.03 // RESPONSE</span>
+                    <span class="card-badge">FIELD</span>
+                </div>
+                <div>
+                    <h2 class="card-title">Civilian Hazard Protocol & Risk Assessment</h2>
+                    <p class="card-desc">
+                        Identifying secondary collapse vectors, interpreting automated alerts, and safe extraction routing.
+                    </p>
+                </div>
+                <div class="card-bottom">
+                    <span>DURATION: 01 WEEK</span>
+                    <span class="card-action">ACCESS [ENTER] →</span>
+                </div>
+            </article>
+
+            <!-- Card 04 -->
+            <article class="course-card span-4">
+                <span class="card-corner corner-tl">+</span>
+                <span class="card-corner corner-tr">+</span>
+                <span class="card-corner corner-bl">+</span>
+                <span class="card-corner corner-br">+</span>
+
+                <div class="card-top">
+                    <span class="card-id">MOD.04 // OPS</span>
+                    <span class="card-badge">TECHNICAL</span>
+                </div>
+                <div>
+                    <h2 class="card-title">Low-Bandwidth Telemetry Relay</h2>
+                    <p class="card-desc">
+                        Maintaining transmission integrity when local cellular and satellite uplinks fail via sub-GHz radio packet broadcast.
+                    </p>
+                </div>
+                <div class="card-bottom">
+                    <span>DURATION: 03 WEEKS</span>
+                    <span class="card-action">ACCESS [ENTER] →</span>
+                </div>
+            </article>
+
+            <!-- Card 05 -->
+            <article class="course-card span-4">
+                <span class="card-corner corner-tl">+</span>
+                <span class="card-corner corner-tr">+</span>
+                <span class="card-corner corner-bl">+</span>
+                <span class="card-corner corner-br">+</span>
+
+                <div class="card-top">
+                    <span class="card-id">MOD.05 // SIM</span>
+                    <span class="card-badge">APPLIED</span>
+                </div>
+                <div>
+                    <h2 class="card-title">Virtual Incident Commander Drill</h2>
+                    <p class="card-desc">
+                        Simulated live incident execution using the TRACE platform dashboard to triage drone and rover alerts in real-time.
+                    </p>
+                </div>
+                <div class="card-bottom">
+                    <span>DURATION: 02 WEEKS</span>
+                    <span class="card-action">ACCESS [ENTER] →</span>
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+    <script>
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sideMenu = document.querySelector('.side-menu');
+
+        if (menuToggle && sideMenu) {
+            menuToggle.addEventListener('click', () => {
+                const isOpen = sideMenu.classList.toggle('is-open');
+                menuToggle.classList.toggle('is-open', isOpen);
+                menuToggle.setAttribute('aria-expanded', isOpen);
+                sideMenu.setAttribute('aria-hidden', !isOpen);
+            });
+        }
+
+        const wipBanner = document.getElementById('wipBanner');
+        const bannerText = document.getElementById('bannerText');
+        let bannerTimeout = null;
+
+        document.querySelectorAll('.nav-btn').forEach((btn) => {
+            btn.addEventListener('click', () => {
+                const href = btn.dataset.href;
+                if (href) {
+                    window.location.href = href;
+                    return;
+                }
+
+                const page = btn.dataset.page;
+                bannerText.textContent = `SECTION [${page}] IS UNDER DEVELOPMENT`;
+                wipBanner.classList.add('active');
+
+                if (bannerTimeout) clearTimeout(bannerTimeout);
+                bannerTimeout = setTimeout(() => {
+                    wipBanner.classList.remove('active');
+                }, 2800);
+            });
+        });
+    </script>
+
+</body>
+</html>
