@@ -1,754 +1,1087 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-    <title>TRACE (01)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Martian+Mono:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>TRACE — Tactical Reconnaissance and Assessment for Critical Environments</title>
+    <meta name="description" content="TRACE: two intelligent rovers that map disaster zones in real time.">
     <style>
-        *, *::before, *::after {
-            box-sizing: border-box;
-            user-select: none;
+      :root {
+        --bg: #ece9e1;
+        --ink: #0d0d0d;
+        --card: #f7f5ef;
+        --accent: #ff4f00;
+        --mute: #5b5a55;
+        --line: 3px;
+        --sp: clamp(16px, 3vw, 32px);
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --sans: "Helvetica Neue", Arial, system-ui, sans-serif;
+        --shadow: 6px 6px 0 var(--ink);
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #111110;
+          --ink: #f1eee6;
+          --card: #1a1a18;
+          --mute: #a09e94;
         }
-        :root {
-            --bg-base: #eceae5;
-            --ink-main: #0c0d0e;
-            --ink-muted: #62635f;
-            --accent-tactical: #989691;
-            --font-mono: 'Martian Mono', monospace;
-            --title-tilt: -1.5deg;
-            --rover-tilt: 2.2deg;
-        }
-        html, body {
-            margin: 0;
-            padding: 0;
-            width: 100%;
-            min-height: 100%;
-            overflow-x: hidden;
-            overflow-y: auto;
-            background-color: var(--bg-base);
-            font-family: var(--font-mono);
-            color: var(--ink-main);
-            cursor: auto;
-            scrollbar-color: var(--accent-tactical) transparent;
-            scrollbar-width: thin;
+      }
+
+      :root[data-theme="dark"] {
+        --bg: #111110;
+        --ink: #f1eee6;
+        --card: #1a1a18;
+        --mute: #a09e94;
+      }
+
+      *, *::before, *::after {
+        box-sizing: inherit;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: calc(80px + env(safe-area-inset-top, 0px));
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 400 17px/1.5 var(--sans);
+        background-image: linear-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 var(--sp);
+      }
+
+      .mono {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      section {
+        padding: clamp(56px, 9vw, 110px) 0;
+        border-top: var(--line) solid var(--ink);
+      }
+
+      h1, h2, h3 {
+        margin: 0;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        font-weight: 900;
+      }
+
+      h1 {
+        font-size: clamp(4rem, 15vw, 11rem);
+      }
+
+      h2 {
+        font-size: clamp(2.2rem, 6vw, 4.4rem);
+        max-width: 16ch;
+      }
+
+      h3 {
+        font-size: 1.4rem;
+        letter-spacing: -0.01em;
+      }
+
+      .tag {
+        display: inline-block;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 3px 9px;
+        margin-bottom: 18px;
+      }
+
+      .box {
+        background: var(--card);
+        border: var(--line) solid var(--ink);
+        border-radius: 2px;
+      }
+
+      .btn {
+        display: inline-block;
+        font: 800 0.95rem var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        padding: 14px 22px;
+        border: var(--line) solid var(--ink);
+        background: var(--accent);
+        color: #0d0d0d;
+        box-shadow: 4px 4px 0 var(--ink);
+        transition: transform 0.12s, box-shadow 0.12s;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 7px 7px 0 var(--ink);
+      }
+
+      .btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 1px 1px 0 var(--ink);
+      }
+
+      .btn.alt {
+        background: var(--card);
+        color: var(--ink);
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--bg);
+        border-bottom: var(--line) solid var(--ink);
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        height: 64px;
+      }
+
+      .logo {
+        font-weight: 900;
+        font-size: 1.5rem;
+        text-decoration: none;
+        letter-spacing: -0.04em;
+      }
+
+      .logo b {
+        color: var(--accent);
+      }
+
+      .links {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+        align-items: center;
+      }
+
+      .links a {
+        font: 700 0.8rem var(--mono);
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 8px 10px;
+        border: 2px solid transparent;
+      }
+
+      .links a:hover {
+        border-color: var(--ink);
+      }
+
+      .links .btn {
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        margin-left: 8px;
+      }
+
+      .menu {
+        display: none;
+        margin-left: auto;
+        font: 800 0.8rem var(--mono);
+        background: var(--card);
+        color: var(--ink);
+        border: var(--line) solid var(--ink);
+        padding: 9px 12px;
+      }
+
+      @media (max-width: 860px) {
+        .menu {
+          display: block;
         }
 
-        .hero-section {
-            position: relative;
-            width: 100%;
-            height: 100dvh;
-            overflow: hidden;
-            background: linear-gradient(180deg, rgba(255,255,255,0.2), rgba(0,0,0,0.02));
+        .links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: stretch;
+          background: var(--bg);
+          border-bottom: var(--line) solid var(--ink);
+          padding: 12px var(--sp);
+          margin: 0;
         }
 
-        .overlay-vignette {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-            z-index: 10;
-            box-shadow: inset 0 0 100px rgba(0, 0, 0, 0.05);
+        .links.open {
+          display: flex;
         }
 
-        #grid {
-            position: absolute;
-            inset: 0;
-            width: 100%;
-            height: 100%;
-            display: block;
-            z-index: 1;
+        .links a {
+          padding: 14px 8px;
+          border-bottom: 2px solid var(--ink);
         }
 
-        .editorial-stage {
-            position: absolute;
-            inset: 0;
-            z-index: 15;
-            pointer-events: none;
+        .links .btn {
+          margin: 12px 0 0;
+          text-align: center;
+        }
+      }
+
+      .hero {
+        border-top: 0;
+        padding-top: clamp(32px, 6vw, 72px);
+      }
+
+      .hero-grid {
+        display: grid;
+        grid-template-columns: 1.1fr 1fr;
+        gap: var(--sp);
+        align-items: end;
+      }
+
+      .hero p.lead {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        max-width: 34ch;
+        margin: 22px 0 28px;
+      }
+
+      .cta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 14px;
+      }
+
+      .ticker {
+        margin-top: clamp(32px, 5vw, 56px);
+        border: var(--line) solid var(--ink);
+        background: var(--ink);
+        color: var(--bg);
+        overflow: hidden;
+        white-space: nowrap;
+      }
+
+      .ticker div {
+        display: inline-block;
+        padding: 10px 0;
+        animation: tick 28s linear infinite;
+      }
+
+      .ticker span {
+        padding: 0 22px;
+      }
+
+      @keyframes tick {
+        to {
+          transform: translateX(-50%);
+        }
+      }
+
+      @media (max-width: 860px) {
+        .hero-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .map {
+        position: relative;
+        aspect-ratio: 1 / 1;
+        max-width: 520px;
+        width: 100%;
+        margin-left: auto;
+        box-shadow: var(--shadow);
+        overflow: hidden;
+        background-image: linear-gradient(var(--ink) 1px, transparent 1px), linear-gradient(90deg, var(--ink) 1px, transparent 1px);
+        background-size: 12.5% 12.5%;
+        background-color: var(--card);
+      }
+
+      .map .bar {
+        position: absolute;
+        inset: 0 0 auto 0;
+        display: flex;
+        justify-content: space-between;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 7px 12px;
+        z-index: 3;
+      }
+
+      .map-note {
+        position: absolute;
+        left: 12px;
+        right: 12px;
+        bottom: 38px;
+        z-index: 3;
+        text-align: center;
+        background: rgba(236, 233, 225, 0.9);
+        color: var(--mute);
+        border-top: var(--line) solid var(--ink);
+        border-bottom: var(--line) solid var(--ink);
+        padding: 7px 12px;
+      }
+
+      .cell {
+        position: absolute;
+        width: 12.5%;
+        height: 12.5%;
+        transition: background 0.4s;
+      }
+
+      .cell.s {
+        background: color-mix(in srgb, var(--ink) 16%, transparent);
+      }
+
+      .cell.h {
+        background: var(--accent);
+      }
+
+      .rover {
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        background: var(--ink);
+        border: 3px solid var(--accent);
+        transform: translate(-50%, -50%);
+        transition: left 0.6s steps(4), top 0.6s steps(4);
+        z-index: 2;
+      }
+
+      .rover::after {
+        content: attr(data-id);
+        position: absolute;
+        top: -22px;
+        left: -4px;
+        font: 800 0.7rem var(--mono);
+        color: var(--ink);
+      }
+
+      .legend {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        gap: 14px;
+        background: var(--bg);
+        border-top: var(--line) solid var(--ink);
+        padding: 7px 12px;
+        z-index: 3;
+      }
+
+      .legend i {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border: 2px solid var(--ink);
+        margin-right: 5px;
+      }
+
+      .about {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: var(--sp);
+      }
+
+      .about .copy {
+        display: grid;
+        gap: 18px;
+        font-size: 1.15rem;
+      }
+
+      .about .copy p {
+        margin: 0;
+        padding-left: 16px;
+        border-left: var(--line) solid var(--accent);
+      }
+
+      @media (max-width: 860px) {
+        .about {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp);
+        margin-top: clamp(28px, 5vw, 48px);
+      }
+
+      .card {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 230px;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+
+      .card:hover {
+        transform: translate(-4px, -4px);
+        box-shadow: var(--shadow);
+      }
+
+      .card .n {
+        font: 900 2.6rem/1 var(--mono);
+        color: var(--accent);
+        -webkit-text-stroke: 2px var(--ink);
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--mute);
+      }
+
+      .card .mono {
+        margin-top: auto;
+        border-top: 2px solid var(--ink);
+        padding-top: 10px;
+      }
+
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
         }
 
-        /* Technical glyph/status marker */
-        .system-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            padding: 0.25rem 0.6rem;
-            border: 1px solid rgba(17, 17, 17, 0.2);
-            background: rgba(255, 255, 255, 0.4);
-            backdrop-filter: blur(4px);
-            font-size: 0.65rem;
-            font-weight: 700;
-            letter-spacing: 0.1em;
-            margin-bottom: 1.2rem;
-            text-transform: uppercase;
+        .card {
+          min-height: 0;
+        }
+      }
+
+      .steps {
+        display: grid;
+        grid-template-columns: 280px 1fr;
+        gap: var(--sp);
+        margin-top: clamp(28px, 5vw, 48px);
+      }
+
+      .tabs {
+        display: grid;
+        gap: 0;
+        align-content: start;
+      }
+
+      .tab {
+        font: 800 0.95rem var(--mono);
+        text-align: left;
+        text-transform: uppercase;
+        padding: 18px;
+        background: var(--card);
+        color: var(--ink);
+        border: var(--line) solid var(--ink);
+        margin-bottom: -3px;
+        cursor: pointer;
+        transition: background 0.15s, padding 0.15s;
+      }
+
+      .tab:hover {
+        padding-left: 26px;
+      }
+
+      .tab[aria-selected="true"] {
+        background: var(--ink);
+        color: var(--bg);
+      }
+
+      .panel {
+        padding: clamp(20px, 4vw, 40px);
+        min-height: 260px;
+        box-shadow: var(--shadow);
+      }
+
+      .panel h3 {
+        font-size: clamp(1.8rem, 4vw, 3rem);
+        margin: 8px 0 14px;
+      }
+
+      .panel .bigno {
+        font: 900 clamp(4rem, 10vw, 7rem)/1 var(--mono);
+        color: var(--accent);
+        -webkit-text-stroke: 2px var(--ink);
+      }
+
+      @media (max-width: 860px) {
+        .steps {
+          grid-template-columns: 1fr;
         }
 
-        .hero-group {
-            position: absolute;
-            top: clamp(4.5rem, 14dvh, 10rem);
-            left: clamp(1.25rem, 6vw, 7rem);
-            width: min(58vw, 46rem);
-            max-width: calc(100vw - 3rem);
-            transform: rotate(var(--title-tilt));
-            transform-origin: left top;
-            pointer-events: none;
+        .tabs {
+          grid-auto-flow: column;
+          grid-auto-columns: 1fr;
         }
 
-        .hero-title {
-            margin: 0;
-            font-size: clamp(3.2rem, 11vw, 13.5rem);
-            line-height: 0.82;
-            font-weight: 800;
-            letter-spacing: -0.06em;
-            color: var(--ink-main);
+        .tab {
+          margin: 0 -3px 0 0;
+          padding: 14px 4px;
+          text-align: center;
+        }
+      }
+
+      .ui {
+        margin-top: clamp(28px, 5vw, 48px);
+        box-shadow: var(--shadow);
+      }
+
+      .ui .top {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 9px 14px;
+      }
+
+      .ui .top i {
+        width: 11px;
+        height: 11px;
+        border: 2px solid var(--bg);
+      }
+
+      .ui .body {
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+      }
+
+      .ui .pane {
+        padding: 20px;
+        border-right: var(--line) solid var(--ink);
+      }
+
+      .ui .feed {
+        padding: 20px;
+        display: grid;
+        gap: 10px;
+        align-content: start;
+      }
+
+      .log {
+        border: 2px solid var(--ink);
+        padding: 10px;
+        background: var(--bg);
+        display: flex;
+        gap: 10px;
+        font-size: 0.92rem;
+        animation: in 0.4s both;
+      }
+
+      .log b {
+        font-family: var(--mono);
+        color: var(--accent);
+        flex: none;
+      }
+
+      @keyframes in {
+        from {
+          opacity: 0;
+          transform: translateX(12px);
+        }
+      }
+
+      .bars {
+        display: flex;
+        align-items: end;
+        gap: 6px;
+        height: 130px;
+        margin-top: 12px;
+      }
+
+      .bars i {
+        flex: 1;
+        background: var(--ink);
+        transition: height 0.5s;
+        border-top: 6px solid var(--accent);
+      }
+
+      @media (max-width: 860px) {
+        .ui .body {
+          grid-template-columns: 1fr;
         }
 
-        .hero-description {
-            margin: 1.5rem 0 0 0.2rem;
-            max-width: 32rem;
-            width: 100%;
-            color: var(--ink-muted);
-            font-size: clamp(0.78rem, 1.1vw, 1rem);
-            line-height: 1.6;
-            font-weight: 500;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
+        .ui .pane {
+          border-right: 0;
+          border-bottom: var(--line) solid var(--ink);
+        }
+      }
+
+      .chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        margin-top: clamp(28px, 5vw, 48px);
+      }
+
+      .chip {
+        font: 800 0.9rem var(--mono);
+        text-transform: uppercase;
+        padding: 12px 16px;
+        border: var(--line) solid var(--ink);
+        background: var(--card);
+        transition: background 0.15s, color 0.15s, transform 0.15s;
+      }
+
+      .chip:hover {
+        background: var(--accent);
+        color: #0d0d0d;
+        transform: rotate(-1.5deg);
+      }
+
+      .chip small {
+        display: block;
+        font-weight: 400;
+        color: var(--mute);
+        text-transform: none;
+        letter-spacing: 0;
+        margin-top: 2px;
+      }
+
+      .chip:hover small {
+        color: #0d0d0d;
+      }
+
+      .final {
+        background: var(--accent);
+        color: #0d0d0d;
+        text-align: left;
+      }
+
+      .final h2 {
+        max-width: 14ch;
+        font-size: clamp(2.6rem, 8vw, 6.5rem);
+      }
+
+      .final .btn {
+        background: #0d0d0d;
+        color: #f1eee6;
+        border-color: #0d0d0d;
+        box-shadow: 5px 5px 0 #f1eee6;
+        margin-top: 28px;
+      }
+
+      .final .btn:hover {
+        box-shadow: 8px 8px 0 #f1eee6;
+      }
+
+      .final .tag {
+        background: #0d0d0d;
+        color: #f1eee6;
+      }
+
+      footer {
+        border-top: var(--line) solid var(--ink);
+        padding: 36px 0 48px;
+      }
+
+      .foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: space-between;
+        align-items: end;
+      }
+
+      .foot nav {
+        height: auto;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .foot a {
+        font: 700 0.8rem var(--mono);
+        text-transform: uppercase;
+      }
+
+      .rv {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.5s, transform 0.5s;
+      }
+
+      .rv.on {
+        opacity: 1;
+        transform: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto;
         }
 
-        /* Rover Frame */
-        .rover-frame {
-            position: absolute;
-            bottom: clamp(2rem, 6dvh, 4rem);
-            right: clamp(1.25rem, 6vw, 9rem);
-            width: min(40vw, 42rem);
-            min-width: 14rem;
-            aspect-ratio: 16 / 10;
-            background: rgba(255, 255, 255, 0.25);
-            backdrop-filter: blur(10px);
-            border: 1px dashed rgba(17, 17, 17, 0.25);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0.85rem;
-            transform: rotate(var(--rover-tilt));
-            pointer-events: auto;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.03);
+        .rv {
+          opacity: 1;
+          transform: none;
         }
-        .rover-frame img {
-            width: 100%;
-            height: 100%;
-            object-fit: contain;
-            display: block;
-            filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.12));
-        }
-
-        /* Technical Corners */
-        .rover-frame .bracket {
-            position: absolute;
-            width: 8px;
-            height: 8px;
-            border-color: var(--ink-main);
-            pointer-events: none;
-        }
-        .bracket.tl { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
-        .bracket.tr { top: -1px; right: -1px; border-top: 2px solid; border-right: 2px solid; }
-        .bracket.bl { bottom: -1px; left: -1px; border-bottom: 2px solid; border-left: 2px solid; }
-        .bracket.br { bottom: -1px; right: -1px; border-bottom: 2px solid; border-right: 2px solid; }
-
-        .frame-label {
-            position: absolute;
-            bottom: -1.4rem;
-            right: 0;
-            font-size: 0.62rem;
-            letter-spacing: 0.14em;
-            color: var(--ink-muted);
-            font-weight: 700;
-        }
-
-        /* What We Do Section */
-        .about-section {
-            position: relative;
-            z-index: 20;
-            width: 100%;
-            background-color: var(--bg-base);
-            border-top: 1px solid rgba(17, 17, 17, 0.15);
-            padding: clamp(3.5rem, 8vw, 6rem) clamp(1.5rem, 6vw, 7rem);
-        }
-        .about-inner {
-            max-width: 76rem;
-            width: 100%;
-        }
-        .about-label {
-            display: block;
-            font-size: clamp(0.72rem, 0.9vw, 0.82rem);
-            font-weight: 800;
-            letter-spacing: 0.18em;
-            color: var(--ink-main);
-            margin-bottom: 0.9rem;
-            text-transform: uppercase;
-            opacity: 0.8;
-        }
-        .about-title {
-            margin: 0 0 1.3rem;
-            font-size: clamp(2.4rem, 5.2vw, 5.4rem);
-            line-height: 0.9;
-            letter-spacing: -0.06em;
-            font-weight: 800;
-            color: var(--ink-main);
-        }
-        .about-copy {
-            margin: 0;
-            width: min(100%, 64rem);
-            font-size: clamp(1.05rem, 1.7vw, 1.4rem);
-            line-height: 1.75;
-            font-weight: 400;
-            letter-spacing: -0.02em;
-            color: var(--ink-main);
-        }
-
-        /* Menu Button */
-        .menu-wrapper {
-            position: fixed;
-            top: calc(1.5rem + env(safe-area-inset-top, 0px));
-            right: calc(1.5rem + env(safe-area-inset-right, 0px));
-            width: 3.5rem;
-            height: 3.5rem;
-            z-index: 60;
-            display: grid;
-            place-items: center;
-        }
-        .orbitals {
-            position: absolute;
-            inset: 0;
-            pointer-events: none;
-        }
-        .orbitals::before,
-        .orbitals::after {
-            content: '';
-            position: absolute;
-            border: 1px dashed rgba(17, 17, 17, 0.35);
-        }
-        .orbitals::before {
-            inset: -4px;
-            border-radius: 50%;
-            animation: spinRingOne 20s linear infinite;
-        }
-        .orbitals::after {
-            inset: 2px;
-            border-color: var(--ink-main);
-            border-style: solid;
-            border-radius: 50%;
-            opacity: 0.4;
-            animation: spinRingTwo 12s linear infinite reverse;
-        }
-        @keyframes spinRingOne {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes spinRingTwo {
-            0% { transform: rotate(360deg); }
-            100% { transform: rotate(0deg); }
-        }
-
-        .menu-toggle {
-            position: relative;
-            z-index: 2;
-            width: 2.4rem;
-            height: 2.4rem;
-            background: rgba(255, 255, 255, 0.4);
-            border: 1px solid rgba(17, 17, 17, 0.25);
-            backdrop-filter: blur(8px);
-            cursor: pointer;
-            display: grid;
-            place-items: center;
-            padding: 0;
-            transition: all 0.2s ease;
-        }
-        .menu-toggle:hover {
-            border-color: var(--ink-main);
-        }
-        .menu-toggle span {
-            width: 1rem;
-            height: 2px;
-            background: var(--ink-main);
-            position: relative;
-            transition: background-color 0.2s;
-        }
-        .menu-toggle span::before,
-        .menu-toggle span::after {
-            content: '';
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: var(--ink-main);
-            transition: transform 0.2s ease;
-        }
-        .menu-toggle span::before { top: -5px; }
-        .menu-toggle span::after { top: 5px; }
-
-        .menu-toggle.is-open span {
-            background: transparent;
-        }
-        .menu-toggle.is-open span::before {
-            transform: translateY(5px) rotate(45deg);
-            background: var(--ink-main);
-        }
-        .menu-toggle.is-open span::after {
-            transform: translateY(-5px) rotate(-45deg);
-            background: var(--ink-main);
-        }
-
-        /* Sidebar Navigation */
-        .side-menu {
-            position: fixed;
-            top: 0;
-            right: 0;
-            width: min(85vw, 22rem);
-            height: 100vh;
-            padding: 6.5rem 2.2rem 3rem;
-            background: rgba(236, 234, 229, 0.94);
-            backdrop-filter: blur(20px);
-            border-left: 1px solid rgba(17, 17, 17, 0.15);
-            z-index: 55;
-            transform: translateX(100%);
-            transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-            display: flex;
-            flex-direction: column;
-            gap: 1.2rem;
-        }
-        .side-menu.is-open {
-            transform: translateX(0);
-        }
-        .nav-btn {
-            background: none;
-            border: none;
-            border-bottom: 1px solid rgba(17, 17, 17, 0.2);
-            padding: 0.8rem 0;
-            text-align: left;
-            font-family: var(--font-mono);
-            font-size: 0.85rem;
-            font-weight: 700;
-            letter-spacing: 0.08em;
-            color: var(--ink-main);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.2s ease;
-        }
-        .nav-btn:hover {
-            color: var(--ink-muted);
-            padding-left: 0.4rem;
-            border-bottom-color: var(--ink-main);
-        }
-        .nav-btn span.arrow {
-            font-size: 0.8rem;
-            opacity: 0.4;
-        }
-        .nav-btn:hover span.arrow {
-            transform: translateX(3px);
-            opacity: 1;
-        }
-
-        /* WIP Alert Banner */
-        .alert-banner {
-            position: fixed;
-            top: 1.5rem;
-            left: 50%;
-            transform: translateX(-50%) translateY(-25px);
-            opacity: 0;
-            pointer-events: none;
-            z-index: 80;
-            background: #0f1011;
-            color: #ffffff;
-            padding: 0.65rem 1.4rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-left: 3px solid var(--accent-tactical);
-            font-size: 0.72rem;
-            font-weight: 600;
-            letter-spacing: 0.08em;
-            transition: all 0.25s ease;
-            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.12);
-            white-space: nowrap;
-        }
-        .alert-banner.active {
-            opacity: 1;
-            transform: translateX(-50%) translateY(0);
-        }
-        .alert-banner .tag {
-            color: var(--accent-tactical);
-            font-weight: 800;
-            margin-right: 0.5rem;
-        }
-
-        /* Liquid Cursor */
-        .liquid-layer {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 999;
-            filter: url("#liquid-filter");
-        }
-        .liquid-drop {
-            position: absolute;
-            top: 0;
-            left: 0;
-            border-radius: 50%;
-            background: #000000;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-        .liquid-core {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            background: #000000;
-            transform: translate(-50%, -50%);
-            will-change: transform;
-        }
-
-        @media (max-width: 900px) {
-            :root {
-                --title-tilt: 0deg;
-                --rover-tilt: 0deg;
-            }
-            .hero-group {
-                top: 6.5rem;
-                left: 1.5rem;
-                width: min(70vw, 32rem);
-            }
-            .hero-title {
-                font-size: clamp(3.2rem, 11vw, 6rem);
-            }
-            .rover-frame {
-                bottom: 2rem;
-                right: 1.5rem;
-                width: min(85vw, 22rem);
-            }
-        }
-
-        @media (max-width: 560px) {
-            .editorial-stage {
-                display: flex;
-                flex-direction: column;
-                justify-content: flex-start;
-                gap: 1.5rem;
-                padding: calc(4.8rem + env(safe-area-inset-top, 0px)) 1.25rem 2rem;
-                inset: 0;
-                position: absolute;
-                overflow-y: hidden;
-            }
-            .hero-group {
-                position: static;
-                width: 100%;
-                max-width: 100%;
-                transform: none;
-            }
-            .hero-title {
-                font-size: clamp(2.8rem, 14vw, 4.4rem);
-                line-height: 0.9;
-            }
-            .hero-description {
-                margin: 0.8rem 0 0 0;
-                font-size: 0.78rem;
-                line-height: 1.5;
-            }
-            .rover-frame {
-                position: static;
-                width: 100%;
-                max-width: 20rem;
-                margin: 0 auto;
-                transform: none;
-            }
-        }
+      }
     </style>
-</head>
-<body>
-    <section class="hero-section">
-        <div class="overlay-vignette"></div>
-        <canvas id="grid"></canvas>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <nav aria-label="Primary">
+          <a class="logo" href="#top">TRACE<b>.</b></a>
+          <button class="menu" aria-expanded="false" aria-controls="links">MENU</button>
+          <div class="links" id="links">
+            <a href="#top">Home</a>
+            <a href="courses.html">Courses</a>
+            <a href="#features">News</a>
+            <a href="#interface">Software</a>
+            <a href="#about">About Us</a>
+            <a class="btn" href="https://traceresponse.vercel.app">AI Chatbot</a>
+          </div>
+        </nav>
+      </div>
+    </header>
 
-        <div class="editorial-stage">
-            <div class="hero-group">
-                <div class="system-pill">
-                    <span>SYS.01 // RECON</span>
-                </div>
-                <h1 class="hero-title">TRACE</h1>
-                <p class="hero-description">
-                    Tactical Reconnaissance and Assessment for Critical Environments.
-                </p>
+    <main id="top">
+      <section class="hero">
+        <div class="wrap">
+          <div class="hero-grid">
+            <div>
+              <span class="tag mono">SYS.01 // RECON</span>
+              <h1>TRACE</h1>
+              <p class="lead">Tactical Reconnaissance and Assessment for Critical Environments. Two rovers go in first, so responders know where it’s safe to follow.</p>
+              <div class="cta">
+                <a class="btn" href="https://traceresponse.vercel.app">Explore the platform</a>
+                <a class="btn alt" href="#how">How it works</a>
+              </div>
             </div>
 
-            <div class="rover-frame">
-                <div class="bracket tl"></div>
-                <div class="bracket tr"></div>
-                <div class="bracket bl"></div>
-                <div class="bracket br"></div>
-                <img src="image.png" alt="Rover Unit" onerror="this.alt='[UNIT_ASSET_UNAVAILABLE]'">
-                <span class="frame-label">FIG 1.0 — FIELD ROVER</span>
+            <div class="box map" id="map" role="img" aria-label="Animated mockup of two rovers mapping a grid and flagging hazards">
+              <div class="bar mono">
+                <span>LIVE MAP</span>
+                <span id="clock">SCAN 00%</span>
+              </div>
+              <div class="map-note mono">for visual representation only</div>
+              <div class="legend mono">
+                <span><i style="background: color-mix(in srgb, var(--ink) 20%, transparent)"></i>Scanned</span>
+                <span><i style="background: var(--accent)"></i>Hazard</span>
+              </div>
             </div>
+          </div>
+
+          <div class="ticker mono" aria-hidden="true">
+            <div>
+              <span>● 2 ROVERS</span>
+              <span>▲ LOW-COST MAPPING</span>
+              <span>■ REAL-TIME UPDATES</span>
+              <span>● CUSTOM SOFTWARE</span>
+              <span>▲ OPEN TO CIVILIANS + RESPONDERS</span>
+              <span>■ 2 ROVERS</span>
+              <span>● LOW-COST MAPPING</span>
+              <span>▲ REAL-TIME UPDATES</span>
+              <span>■ CUSTOM SOFTWARE</span>
+              <span>● OPEN TO CIVILIANS + RESPONDERS</span>
+            </div>
+          </div>
         </div>
-    </section>
+      </section>
 
-    <!-- What We Do -->
-    <section class="about-section">
-        <div class="about-inner">
-            <span class="about-label">WHAT WE DO</span>
-            <h2 class="about-title">Disaster response, mapped in real time.</h2>
-            <p class="about-copy">
-                TRACE is a disaster-response system built around two intelligent rovers designed to enter dangerous or inaccessible areas where human responders may not know where it is safe to go. Equipped with multiple sensors, cameras, and our own low-cost mapping technology, the rovers explore the environment and collect critical data such as terrain conditions and other real-time information. Our custom software processes and combines this data to create a clear picture of the affected area and can be downloaded directly from our website. The collected information is transmitted to our online platform, where civilians and response teams can access real-time disaster updates and situational information.
-            </p>
+      <section id="about">
+        <div class="wrap about">
+          <div class="rv">
+            <span class="tag mono">01 // What we do</span>
+            <h2>Disaster response, mapped in real time.</h2>
+          </div>
+          <div class="copy rv">
+            <p>TRACE is a disaster-response system built around <strong>two intelligent rovers</strong> that enter dangerous or inaccessible areas where responders can’t tell what’s safe.</p>
+            <p>Sensors, cameras and our own <strong>low-cost mapping technology</strong> capture terrain conditions and live data from inside the zone.</p>
+            <p>Custom software merges it into one clear picture, shared on an online platform for <strong>civilians and response teams</strong>.</p>
+          </div>
         </div>
-    </section>
+      </section>
 
-    <!-- Menu Toggle -->
-    <div class="menu-wrapper">
-        <div class="orbitals" aria-hidden="true"></div>
-        <button class="menu-toggle" type="button" aria-label="Toggle navigation" aria-expanded="false">
-            <span></span>
-        </button>
-    </div>
+      <section id="features">
+        <div class="wrap">
+          <span class="tag mono">02 // Capabilities</span>
+          <h2 class="rv">Built for places no one can scout.</h2>
+          <div class="grid">
+            <article class="box card rv"><span class="n">01</span><h3>Rover units</h3><p>Two intelligent rovers enter hazardous areas so people don’t have to.</p><span class="mono">Hardware</span></article>
+            <article class="box card rv"><span class="n">02</span><h3>Multi-sensor capture</h3><p>Sensors and cameras collect terrain conditions and other real-time information.</p><span class="mono">Sensing</span></article>
+            <article class="box card rv"><span class="n">03</span><h3>Low-cost mapping</h3><p>Our own mapping technology keeps the system affordable to build and deploy.</p><span class="mono">Mapping</span></article>
+            <article class="box card rv"><span class="n">04</span><h3>Custom software</h3><p>Processes and combines rover data into a single view. Downloadable from our site.</p><span class="mono">Software</span></article>
+            <article class="box card rv"><span class="n">05</span><h3>Online platform</h3><p>Data is transmitted to a web platform for live disaster updates.</p><span class="mono">Platform</span></article>
+            <article class="box card rv"><span class="n">06</span><h3>Open access</h3><p>Built for both civilians and response teams to see situational information.</p><span class="mono">Access</span></article>
+          </div>
+        </div>
+      </section>
 
-    <!-- Sidebar Drawer -->
-    <aside class="side-menu" aria-hidden="true">
-        <button class="nav-btn" data-page="HOME" data-href="index.html"><span>(01) HOME</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="COURSES" data-href="courses.html"><span>(02) COURSES</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="NEWS"><span>(03) NEWS</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="ABOUT US"><span>(04) ABOUT US</span><span class="arrow">→</span></button>
-        <button class="nav-btn" data-page="SOFTWARE"><span>(05) SOFTWARE</span><span class="arrow">→</span></button>
-    </aside>
+      <section id="how">
+        <div class="wrap">
+          <span class="tag mono">03 // Workflow</span>
+          <h2 class="rv">Four steps. Zero guesswork.</h2>
+          <div class="steps">
+            <div class="tabs" role="tablist" aria-label="Workflow steps"></div>
+            <div class="box panel" role="tabpanel" aria-live="polite"></div>
+          </div>
+        </div>
+      </section>
 
-    <!-- Work In Progress Notice -->
-    <div class="alert-banner" id="wipBanner">
-        <span class="tag">[LIVE_DEV]</span>
-        <span id="bannerText">MODULE CURRENTLY IN PROGRESS</span>
-    </div>
+      <section id="interface">
+        <div class="wrap">
+          <span class="tag mono">04 // Interface</span>
+          <h2 class="rv">One picture of the zone.</h2>
+          <p class="mono" style="color: var(--mute); margin-top: 14px;">Illustrative preview. Not live data.</p>
+          <div class="box ui rv">
+            <div class="top mono">
+              <i></i>
+              <i></i>
+              <i></i>
+              <span style="margin-left: 8px;">TRACE // SITUATION VIEW</span>
+            </div>
+            <div class="body">
+              <div class="pane">
+                <span class="mono">Terrain conditions</span>
+                <div class="bars" id="bars" aria-hidden="true"></div>
+              </div>
+              <div class="feed" id="feed" aria-live="off">
+                <span class="mono">Field log</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-    <!-- Liquid Filter -->
-    <svg width="0" height="0" style="position: absolute;">
-        <defs>
-            <filter id="liquid-filter">
-                <feGaussianBlur in="SourceGraphic" stdDeviation="10" result="blur" />
-                <feColorMatrix in="blur" mode="matrix"
-                    values="1 0 0 0 0
-                            0 1 0 0 0
-                            0 0 1 0 0
-                            0 0 0 22 -9" result="liquid" />
-                <feComposite in="SourceGraphic" in2="liquid" operator="atop" />
-            </filter>
-        </defs>
-    </svg>
+      <section id="tech">
+        <div class="wrap">
+          <span class="tag mono">05 // Architecture</span>
+          <h2 class="rv">From rover to responder.</h2>
+          <div class="chips rv">
+            <div class="chip">Rovers ×2<small>mobile recon units</small></div>
+            <div class="chip">Sensors + cameras<small>terrain &amp; conditions</small></div>
+            <div class="chip">Mapping tech<small>in-house, low-cost</small></div>
+            <div class="chip">Processing software<small>fuses the data</small></div>
+            <div class="chip">Web platform<small>real-time updates</small></div>
+          </div>
+        </div>
+      </section>
 
-    <div class="liquid-layer" id="liquidLayer">
-        <div class="liquidcore" id="liquidCore"></div>
-    </div>
+      <section class="final">
+        <div class="wrap">
+          <span class="tag mono">06 // Deploy</span>
+          <h2>Know before you go in.</h2>
+          <a class="btn" href="https://traceresponse.vercel.app">Visit TRACE →</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap foot">
+        <div>
+          <a class="logo" href="#top">TRACE<b>.</b></a>
+          <p class="mono" style="margin: 8px 0 0; color: var(--mute);">Tactical Reconnaissance and Assessment for Critical Environments</p>
+        </div>
+        <nav aria-label="Footer">
+          <a href="#top">Home</a>
+          <a href="courses.html">Courses</a>
+          <a href="#features">News</a>
+          <a href="#interface">Software</a>
+          <a href="#about">About Us</a>
+        </nav>
+      </div>
+    </footer>
 
     <script>
-        /* Cursor Tracking */
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let coreX = mouseX;
-        let coreY = mouseY;
-        let lastMouseX = mouseX;
-        let lastMouseY = mouseY;
+      const menu = document.querySelector('.menu');
+      const links = document.getElementById('links');
 
-        window.addEventListener('pointermove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
+      menu.onclick = () => {
+        const open = links.classList.toggle('open');
+        menu.setAttribute('aria-expanded', open);
+      };
+
+      links.addEventListener('click', (event) => {
+        if (event.target.tagName === 'A') {
+          links.classList.remove('open');
+          menu.setAttribute('aria-expanded', false);
+        }
+      });
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('on');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.rv').forEach((element) => io.observe(element));
+
+      const STEPS = [
+        ['Deploy', 'Rovers enter', 'Two rovers go into dangerous or inaccessible areas where responders can’t tell what’s safe.'],
+        ['Sense', 'Data is collected', 'Sensors and cameras gather terrain conditions and other real-time information as the rovers move.'],
+        ['Fuse', 'Software maps it', 'Custom software processes and combines the data into a clear picture of the affected area.'],
+        ['Share', 'Platform goes live', 'Information is sent to the online platform so civilians and response teams see real-time updates.']
+      ];
+
+      const tabs = document.querySelector('.tabs');
+      const panel = document.querySelector('.panel');
+
+      function show(index) {
+        tabs.querySelectorAll('.tab').forEach((tab, tabIndex) => {
+          tab.setAttribute('aria-selected', index === tabIndex);
+          tab.tabIndex = index === tabIndex ? 0 : -1;
         });
 
-        /* Liquid Cursor */
-        const liquidLayer = document.getElementById('liquidLayer');
-        const liquidCore = document.getElementById('liquidCore');
-        const trailCount = 7;
-        const trailNodes = [];
+        panel.innerHTML = `<div class="bigno">0${index + 1}</div><h3>${STEPS[index][1]}</h3><p style="font-size: 1.15rem; max-width: 44ch; margin: 0;">${STEPS[index][2]}</p>`;
+      }
 
-        for (let i = 0; i < trailCount; i++) {
-            const drop = document.createElement('div');
-            drop.className = 'liquid-drop';
-            const size = 32 - i * 3.5;
-            drop.style.width = `${size}px`;
-            drop.style.height = `${size}px`;
-            liquidLayer.appendChild(drop);
+      STEPS.forEach((step, index) => {
+        const button = document.createElement('button');
+        button.className = 'tab';
+        button.role = 'tab';
+        button.textContent = `0${index + 1} ${step[0]}`;
+        button.onclick = () => show(index);
+        button.onkeydown = (event) => {
+          if (event.key === 'ArrowRight' || event.key === 'ArrowDown') {
+            const nextIndex = (index + 1) % 4;
+            show(nextIndex);
+            tabs.children[nextIndex].focus();
+          }
 
-            trailNodes.push({
-                element: drop,
-                x: mouseX,
-                y: mouseY
-            });
-        }
+          if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') {
+            const previousIndex = (index + 3) % 4;
+            show(previousIndex);
+            tabs.children[previousIndex].focus();
+          }
+        };
+        tabs.appendChild(button);
+      });
 
-        function animateCursor() {
-            const dx = mouseX - lastMouseX;
-            const dy = mouseY - lastMouseY;
-            const speed = Math.hypot(dx, dy);
-            lastMouseX = mouseX;
-            lastMouseY = mouseY;
+      show(0);
 
-            coreX += (mouseX - coreX) * 0.25;
-            coreY += (mouseY - coreY) * 0.25;
+      const map = document.getElementById('map');
+      const clock = document.getElementById('clock');
+      const N = 8;
+      const cells = [];
+      const hazards = new Set([10, 27, 44, 51]);
 
-            const angle = Math.atan2(dy, dx);
-            const stretch = Math.min(speed * 0.035, 0.7);
-            const scaleX = 1 + stretch;
-            const scaleY = Math.max(0.65, 1 - stretch * 0.5);
+      for (let i = 0; i < N * N; i += 1) {
+        const cell = document.createElement('div');
+        cell.className = 'cell';
+        cell.style.left = `${(i % N) * 12.5}%`;
+        cell.style.top = `${Math.floor(i / N) * 12.5}%`;
+        map.appendChild(cell);
+        cells.push(cell);
+      }
 
-            liquidCore.style.transform = `translate3d(${coreX}px, ${coreY}px, 0) translate(-50%, -50%) rotate(${angle}rad) scale(${scaleX}, ${scaleY})`;
+      const rovers = [
+        { id: 'R1', x: 0, y: 1, element: null },
+        { id: 'R2', x: 7, y: 6, element: null }
+      ];
 
-            let prevX = coreX;
-            let prevY = coreY;
+      rovers.forEach((rover) => {
+        rover.element = document.createElement('div');
+        rover.element.className = 'rover';
+        rover.element.dataset.id = rover.id;
+        map.appendChild(rover.element);
+      });
 
-            trailNodes.forEach((node, index) => {
-                const followRate = 0.38 - (index * 0.03);
-                node.x += (prevX - node.x) * followRate;
-                node.y += (prevY - node.y) * followRate;
-                node.element.style.transform = `translate3d(${node.x}px, ${node.y}px, 0) translate(-50%, -50%)`;
-                prevX = node.x;
-                prevY = node.y;
-            });
+      let scanned = 0;
 
-            requestAnimationFrame(animateCursor);
-        }
-        animateCursor();
+      function step() {
+        rovers.forEach((rover, index) => {
+          const direction = index ? -1 : 1;
+          rover.x += direction;
 
-        /* Topographic Wire Mesh */
-        const canvas = document.getElementById('grid');
-        const ctx = canvas.getContext('2d');
-        const spacing = 84;
-        let time = 0;
-        let gridMouseX = mouseX;
-        let gridMouseY = mouseY;
+          if (rover.x < 0 || rover.x >= N) {
+            rover.x = index ? N - 1 : 0;
+            rover.y = (rover.y + (index ? -1 : 1) + N) % N || 1;
+          }
 
-        function lineJitter(seed) {
-            const x = Math.sin(seed * 127.1) * 43758.5453;
-            return x - Math.floor(x);
-        }
+          rover.y = Math.min(N - 1, Math.max(1, rover.y));
 
-        function resize() {
-            const dpr = window.devicePixelRatio || 1;
-            canvas.width = window.innerWidth * dpr;
-            canvas.height = window.innerHeight * dpr;
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-        }
-        window.addEventListener('resize', resize);
-        resize();
+          const gridIndex = rover.y * N + rover.x;
+          const cell = cells[gridIndex];
 
-        function drawGrid() {
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+          if (!cell.classList.contains('s') && !cell.classList.contains('h')) {
+            hazards.has(gridIndex) ? cell.classList.add('h') : cell.classList.add('s');
+            scanned += 1;
+          }
 
-            gridMouseX += (mouseX - gridMouseX) * 0.07;
-            gridMouseY += (mouseY - gridMouseY) * 0.07;
-
-            ctx.clearRect(0, 0, width, height);
-
-            const influenceRadius = 240;
-            const displacementForce = 8;
-
-            for (let baseX = -spacing; baseX <= width + spacing; baseX += spacing) {
-                const seed = baseX * 0.013;
-                const phase = lineJitter(seed) * Math.PI * 2;
-                const ampMul = 0.6 + lineJitter(seed + 4.2) * 0.9;
-                const posOffset = (lineJitter(seed + 9.1) - 0.5) * 14;
-                ctx.lineWidth = 0.5 + lineJitter(seed + 1.7) * 0.5;
-                ctx.strokeStyle = `rgba(18, 18, 18, ${0.11 + lineJitter(seed + 2.3) * 0.12})`;
-
-                ctx.beginPath();
-                for (let y = -spacing; y <= height + spacing; y += 6) {
-                    const wave = Math.sin(y * 0.007 + baseX * 0.01 + time * 0.35 + phase) * 6 * ampMul
-                        + Math.sin(y * 0.045 + baseX * 0.02 - time * 0.9 + phase) * 2.2;
-
-                    const distX = baseX - gridMouseX;
-                    const distY = y - gridMouseY;
-                    const distance = Math.hypot(distX, distY);
-                    let cursorDistortion = 0;
-
-                    if (distance < influenceRadius) {
-                        const falloff = 1 - distance / influenceRadius;
-                        cursorDistortion = Math.sin(distance * 0.03 - time * 1.5) * displacementForce * (falloff * falloff);
-                    }
-
-                    const x = baseX + posOffset + wave + cursorDistortion;
-                    if (y === -spacing) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-            }
-
-            for (let baseY = -spacing; baseY <= height + spacing; baseY += spacing) {
-                const seed = baseY * 0.017 + 500;
-                const phase = lineJitter(seed) * Math.PI * 2;
-                const ampMul = 0.6 + lineJitter(seed + 4.2) * 0.9;
-                const posOffset = (lineJitter(seed + 9.1) - 0.5) * 14;
-                ctx.lineWidth = 0.5 + lineJitter(seed + 1.7) * 0.5;
-                ctx.strokeStyle = `rgba(18, 18, 18, ${0.11 + lineJitter(seed + 2.3) * 0.12})`;
-
-                ctx.beginPath();
-                for (let x = -spacing; x <= width + spacing; x += 6) {
-                    const wave = Math.sin(x * 0.007 + baseY * 0.01 + time * 0.35 + phase) * 6 * ampMul
-                        + Math.sin(x * 0.045 + baseY * 0.02 - time * 0.9 + phase) * 2.2;
-
-                    const distX = x - gridMouseX;
-                    const distY = baseY - gridMouseY;
-                    const distance = Math.hypot(distX, distY);
-                    let cursorDistortion = 0;
-
-                    if (distance < influenceRadius) {
-                        const falloff = 1 - distance / influenceRadius;
-                        cursorDistortion = Math.sin(distance * 0.03 - time * 1.5) * displacementForce * (falloff * falloff);
-                    }
-
-                    const y = baseY + posOffset + wave + cursorDistortion;
-                    if (x === -spacing) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-            }
-
-            time += 0.004;
-            requestAnimationFrame(drawGrid);
-        }
-        drawGrid();
-
-        /* Sidebar Toggle */
-        const menuToggle = document.querySelector('.menu-toggle');
-        const sideMenu = document.querySelector('.side-menu');
-
-        menuToggle.addEventListener('click', () => {
-            const isOpen = sideMenu.classList.toggle('is-open');
-            menuToggle.classList.toggle('is-open', isOpen);
-            menuToggle.setAttribute('aria-expanded', isOpen);
-            sideMenu.setAttribute('aria-hidden', !isOpen);
+          rover.element.style.left = `${(rover.x + 0.5) * 12.5}%`;
+          rover.element.style.top = `${(rover.y + 0.5) * 12.5}%`;
         });
 
-        /* WIP Alert Notification */
-        const wipBanner = document.getElementById('wipBanner');
-        const bannerText = document.getElementById('bannerText');
-        let bannerTimeout = null;
+        clock.textContent = `SCAN ${String(Math.min(100, Math.round((scanned / (N * (N - 1))) * 100))).padStart(2, '0')}%`;
 
-        document.querySelectorAll('.nav-btn').forEach((btn) => {
-            btn.addEventListener('click', () => {
-                const href = btn.dataset.href;
-                if (href) {
-                    window.location.href = href;
-                    return;
-                }
+        if (scanned >= N * (N - 1) - 2) {
+          cells.forEach((cell) => {
+            cell.className = 'cell';
+          });
+          scanned = 0;
+        }
+      }
 
-                const page = btn.dataset.page;
-                bannerText.textContent = `SECTION [${page}] IS UNDER DEVELOPMENT`;
-                wipBanner.classList.add('active');
+      step();
+      setInterval(step, 700);
 
-                if (bannerTimeout) clearTimeout(bannerTimeout);
-                bannerTimeout = setTimeout(() => {
-                    wipBanner.classList.remove('active');
-                }, 2800);
-            });
+      const bars = document.getElementById('bars');
+      for (let i = 0; i < 12; i += 1) {
+        bars.appendChild(document.createElement('i'));
+      }
+
+      const msgs = [
+        'R1 // terrain scan complete',
+        'R2 // obstruction flagged',
+        'Software // map updated',
+        'Platform // update published',
+        'R1 // new sector entered',
+        'R2 // camera frame received'
+      ];
+
+      function animateBars() {
+        bars.querySelectorAll('i').forEach((bar) => {
+          bar.style.height = `${25 + Math.random() * 75}%`;
         });
+      }
+
+      animateBars();
+      setInterval(animateBars, 1800);
+
+      const feed = document.getElementById('feed');
+      let messageIndex = 0;
+
+      function logMessage() {
+        const row = document.createElement('div');
+        row.className = 'log';
+        const [prefix, ...rest] = msgs[messageIndex++ % msgs.length].split(' // ');
+        row.innerHTML = `<b>${prefix}</b><span>${rest.join('')}</span>`;
+        feed.insertBefore(row, feed.children[1]);
+
+        while (feed.children.length > 5) {
+          feed.lastChild.remove();
+        }
+      }
+
+      logMessage();
+      logMessage();
+      logMessage();
+      setInterval(logMessage, 2400);
     </script>
-</body>
+  </body>
 </html>
