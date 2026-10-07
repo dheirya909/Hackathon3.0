@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>About Us — TRACE</title>
-    <meta name="description" content="About TRACE: who we are, why we built two rovers for disaster response, and how to reach us.">
+    <meta name="description" content="About TRACE: Tactical Reconnaissance and Assessment for Critical Environments. Meet Team The Black Parade and explore our offline two-rover disaster response system.">
     <link rel="icon" type="image/x-icon" href="/logo.png">
     <style>
       :root {
@@ -82,7 +82,7 @@
         border-top: var(--line) solid var(--ink);
       }
 
-      h1, h2, h3 {
+      h1, h2, h3, h4 {
         margin: 0;
         line-height: 0.95;
         letter-spacing: -0.03em;
@@ -90,8 +90,9 @@
       }
 
       h1 { font-size: clamp(3.4rem, 13vw, 9.5rem); }
-      h2 { font-size: clamp(2.2rem, 6vw, 4.4rem); max-width: 16ch; }
+      h2 { font-size: clamp(2.2rem, 6vw, 4.4rem); max-width: 18ch; }
       h3 { font-size: 1.4rem; letter-spacing: -0.01em; }
+      h4 { font-size: 1.1rem; letter-spacing: -0.01em; }
 
       .tag {
         display: inline-block;
@@ -222,11 +223,18 @@
 
       .hero p.lead {
         font-size: clamp(1.1rem, 2vw, 1.4rem);
-        max-width: 38ch;
+        max-width: 48ch;
         margin: 22px 0 0;
       }
 
-      /* Two-column text blocks */
+      .hero .subhead {
+        font-family: var(--mono);
+        font-weight: 700;
+        color: var(--accent);
+        margin-top: 10px;
+      }
+
+      /* Split Layouts */
       .split {
         display: grid;
         grid-template-columns: 1fr 1.2fr;
@@ -245,7 +253,6 @@
         border-left: var(--line) solid var(--accent);
       }
 
-
       .split .copy p.big {
         font-size: clamp(1.35rem, 2.6vw, 1.85rem);
         line-height: 1.25;
@@ -260,12 +267,16 @@
         .split { grid-template-columns: 1fr; }
       }
 
-      /* Cards */
+      /* Grids & Cards */
       .grid {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
         gap: var(--sp);
         margin-top: clamp(28px, 5vw, 48px);
+      }
+
+      .grid-4 {
+        grid-template-columns: repeat(4, 1fr);
       }
 
       .card {
@@ -290,16 +301,43 @@
         padding-top: 10px;
       }
 
+      /* Tech Stack Section */
+      .tech-group {
+        border-top: var(--line) solid var(--ink);
+        padding-top: 16px;
+        margin-top: 16px;
+      }
+
+      .tech-group ul {
+        margin: 8px 0 0;
+        padding-left: 20px;
+        color: var(--mute);
+        font-size: 0.95rem;
+      }
+
+      .tech-group ul li {
+        margin-bottom: 4px;
+      }
+
+      /* Team Members */
+      .member-card {
+        min-height: 160px;
+      }
+      .member-card .role {
+        font-size: 0.85rem;
+        color: var(--accent);
+        font-weight: 800;
+      }
 
       @media (max-width: 960px) {
         .grid { grid-template-columns: 1fr 1fr; }
+        .grid-4 { grid-template-columns: 1fr 1fr; }
       }
 
       @media (max-width: 600px) {
-        .grid { grid-template-columns: 1fr; }
+        .grid, .grid-4 { grid-template-columns: 1fr; }
         .card { min-height: 0; }
       }
-
 
       /* Final CTA */
       .final {
@@ -348,7 +386,7 @@
         text-transform: uppercase;
       }
 
-      /* Reveal */
+      /* Reveal Animation */
       .rv {
         opacity: 0;
         transform: translateY(18px);
@@ -388,14 +426,17 @@
     </header>
 
     <main id="top">
+      <!-- HERO -->
       <section class="hero">
         <div class="wrap">
           <span class="tag mono">About us</span>
           <h1>About TRACE</h1>
-          <p class="lead">Two rovers go in first, so rescuers know what is safe before they follow.</p>
+          <p class="subhead mono">Tactical Reconnaissance and Assessment for Critical Environments</p>
+          <p class="lead">An offline, affordable, cooperative two-rover emergency system engineered for high-risk indoor reconnaissance and real-time hazard mapping.</p>
         </div>
       </section>
 
+      <!-- PROBLEM STATEMENT -->
       <section id="mission">
         <div class="wrap split">
           <div class="rv">
@@ -403,12 +444,13 @@
             <h2>Rescuers shouldn’t enter blind.</h2>
           </div>
           <div class="copy rv">
-            <p class="big">When an earthquake, fire or flood hits, rescue teams have to enter damaged buildings without knowing which routes are safe.</p>
-            <p>They can’t see structural hazards or which zones are already cleared. That uncertainty puts lives at risk, and most of it is avoidable.</p>
+            <p class="big">During disaster emergencies like earthquakes, fires, and floods, rescue teams enter damaged buildings without real-time knowledge of safe routes, structural hazards, or cleared zones.</p>
+            <p>This severe uncertainty puts lives at risk through completely <strong>avoidable hazards</strong>, delaying critical rescue operations when seconds matter most.</p>
           </div>
         </div>
       </section>
 
+      <!-- SOLUTION -->
       <section id="solution">
         <div class="wrap split">
           <div class="rv">
@@ -416,42 +458,160 @@
             <h2>Two rovers go in first.</h2>
           </div>
           <div class="copy rv">
-            <p class="big">TRACE is an <strong>offline, affordable, two-rover system</strong> that scouts high-risk indoor spaces and maps hazards in real time.</p>
-            <p>Two identical rovers inspect accessible areas side by side and send what they see to a <strong>single local command post</strong>.</p>
-            <p>Sensors, cameras and our own low-cost mapping technology capture conditions inside. Our software merges everything into one clear picture, shared online with <strong>responders and civilians</strong>.</p>
+            <p class="big">TRACE utilizes <strong>two identical, low-cost rovers</strong> that inspect accessible indoor areas side-by-side and relay synchronized observations directly to a single local command post.</p>
+            <p>Using autonomous navigation, custom ultrasonic mapping, and environmental sensors (smoke, temp, distance, camera), TRACE merges telemetry into one clear live map accessible to <strong>responders and civilians</strong>.</p>
           </div>
         </div>
       </section>
 
+      <!-- KEY FEATURES -->
       <section id="principles">
         <div class="wrap">
           <span class="tag mono">Key features</span>
           <h2 class="rv">What TRACE does.</h2>
           <div class="grid">
             <article class="box card rv">
-              <h3>Real-time hazard mapping</h3>
-              <p>Hazards and cleared zones show up on one map as the rovers move through the building.</p>
-              <span class="mono">Mapping</span>
+              <h3>Real-Time Hazard Mapping</h3>
+              <p>Hazards, temperature spikes, smoke density, and cleared zones render live on a unified map as the rovers sweep through building sectors.</p>
+              <span class="mono">Sensors & Mapping</span>
             </article>
             <article class="box card rv">
-              <h3>Autonomous navigation with manual override</h3>
-              <p>The rovers navigate on their own, and an operator can take control at any time.</p>
-              <span class="mono">Control</span>
+              <h3>Autonomous Navigation & Override</h3>
+              <p>Rovers split frontiers automatically using cooperative logic, with seamless manual takeover available for operators whenever needed.</p>
+              <span class="mono">Control System</span>
             </article>
             <article class="box card rv">
-              <h3>Responder telemetry and public updates</h3>
-              <p>Response teams get live rover data, and civilians can see public situation updates.</p>
-              <span class="mono">Access</span>
+              <h3>Responder Telemetry & Public Updates</h3>
+              <p>Tactical response units receive full sensor feeds while censored, essential situation updates are published directly to civilians online.</p>
+              <span class="mono">Live Access</span>
             </article>
           </div>
         </div>
       </section>
 
+      <!-- APPROACH & HARDWARE RELIABILITY -->
+      <section id="approach">
+        <div class="wrap">
+          <span class="tag mono">Technical Approach</span>
+          <h2 class="rv">Engineered for Reliability.</h2>
+          <div class="grid">
+            <article class="box card rv">
+              <h3>Split Reconnaissance</h3>
+              <p>Simultaneous split entry (Rover A left, Rover B right) divides coverage. Real-time frontier reservation prevents route overlap, while dead-end recovery backtracks smoothly.</p>
+              <span class="mono">Cooperative Logic</span>
+            </article>
+            <article class="box card rv">
+              <h3>Acoustic Deconfliction</h3>
+              <p>Ultrasonic range sensors pulse sequentially in 30ms windows to eliminate echo crosstalk between adjacent units operating in tight corridors.</p>
+              <span class="mono">Sensor Harmony</span>
+            </article>
+            <article class="box card rv">
+              <h3>Hardware Protections</h3>
+              <p>Dual power rails isolate motor noise from the 5V ESP32. Cameras and front sensors are recessed behind chassis bumpers to withstand wall impacts.</p>
+              <span class="mono">Hardware Durability</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- TECH STACK -->
+      <section id="tech-stack">
+        <div class="wrap">
+          <span class="tag mono">Architecture</span>
+          <h2 class="rv">The Tech Stack.</h2>
+          <div class="grid">
+            <article class="box card rv">
+              <h3>The Rover Hardware</h3>
+              <div class="tech-group">
+                <ul>
+                  <li><strong>Controller:</strong> ESP32-C3 SuperMini</li>
+                  <li><strong>Sensing/Mapping:</strong> HC-SR04 Ultrasonic</li>
+                  <li><strong>Orientation:</strong> MPU6050 IMU</li>
+                  <li><strong>Sensors:</strong> MQ-2 (Smoke), DHT11 (Temp)</li>
+                  <li><strong>Vision:</strong> ESP32-CAM</li>
+                  <li><strong>Drive:</strong> N20 Motors + DRV8833 Driver</li>
+                </ul>
+              </div>
+              <span class="mono">Hardware</span>
+            </article>
+            <article class="box card rv">
+              <h3>Local Software</h3>
+              <div class="tech-group">
+                <ul>
+                  <li><strong>Network:</strong> Local ESP32 Wi-Fi AP</li>
+                  <li><strong>Protocol:</strong> HTTP Data Transmission</li>
+                  <li><strong>Coordinator:</strong> In-house Python (Tkinter)</li>
+                  <li><strong>Mapping:</strong> Real-time IMU + Ultrasonic fusion</li>
+                  <li><strong>Output:</strong> Live Position, Alerts & Telemetry</li>
+                </ul>
+              </div>
+              <span class="mono">Local Station</span>
+            </article>
+            <article class="box card rv">
+              <h3>Web Platform</h3>
+              <div class="tech-group">
+                <ul>
+                  <li><strong>Live Feed:</strong> Filtered public telemetry</li>
+                  <li><strong>Emergency Map:</strong> Location-based hazard alerts</li>
+                  <li><strong>Database:</strong> Firebase Realtime Sync</li>
+                  <li><strong>Learning:</strong> Certified NDRF safety guidelines</li>
+                  <li><strong>Access:</strong> Responsive Web Platform</li>
+                </ul>
+              </div>
+              <span class="mono">Cloud & Web</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- TEAM DETAILS -->
+      <section id="team">
+        <div class="wrap">
+          <span class="tag mono">Bal Bharati Hackathon 3.0</span>
+          <h2 class="rv">Team: The Black Parade</h2>
+          <p style="margin-top: 10px; color: var(--mute);" class="mono">School: BBPS GRH Marg, New Delhi | Category 2 (10th to 12th)</p>
+
+          <div class="grid grid-4" style="margin-top: 32px;">
+            <article class="box card rv member-card">
+              <h4>Aahana Chawla</h4>
+              <span class="role mono">Team Member</span>
+              <p>Class 11 | Student ID: 514160</p>
+            </article>
+            <article class="box card rv member-card">
+              <h4>Aarav Agarwal</h4>
+              <span class="role mono">Team Member</span>
+              <p>Class 12 | Student ID: 513780</p>
+            </article>
+            <article class="box card rv member-card">
+              <h4>Aarav Parashar</h4>
+              <span class="role mono">Team Member</span>
+              <p>Class 12 | Student ID: 513914</p>
+            </article>
+            <article class="box card rv member-card">
+              <h4>Atharva Keswani</h4>
+              <span class="role mono">Team Member</span>
+              <p>Class 12 | Student ID: 513804</p>
+            </article>
+            <article class="box card rv member-card">
+              <h4>Dheirya Kharbanda</h4>
+              <span class="role mono">Team Leader</span>
+              <p>Class 12 | Student ID: 513743</p>
+            </article>
+            <article class="box card rv member-card">
+              <h4>Ruchi Gupta</h4>
+              <span class="role mono">Mentor</span>
+              <p>BBPS GRHM, New Delhi</p>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <!-- CTA -->
       <section class="final">
         <div class="wrap">
           <span class="tag mono">Try it</span>
           <h2>See the platform.</h2>
-          <a class="btn" href="https://traceresponse.vercel.app">Visit TRACE</a>
+          <a class="btn" href="https://traceresponse.vercel.app" target="_blank" rel="noopener">Visit TRACE</a>
         </div>
       </section>
     </main>
@@ -465,7 +625,7 @@
         <nav aria-label="Footer">
           <a href="index.html">Home</a>
           <a href="courses.html">Courses</a>
-          <a href="index.html#features">News</a>
+          <a href="news.html">News</a>
           <a href="index.html#interface">Software</a>
           <a href="about.html">About Us</a>
           <a href="chat.html">Chat</a>
