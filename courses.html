@@ -5,7 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
     <title>Courses — TRACE</title>
     <link rel="icon" type="image/x-icon" href="/logo.png">
-    <meta name="description" content="TRACE courses: learn disaster-response mapping, rover operation and the TRACE software.">
+    <meta name="description" content="TRACE courses: learn to use the TRACE software, website and AI chatbot, and how to stay safe in earthquakes, fires and floods.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Imperial+Script&display=swap" rel="stylesheet">
 
     <style>
       :root {
@@ -213,6 +216,7 @@
         color: var(--ink);
         border: var(--line) solid var(--ink);
         padding: 9px 12px;
+        cursor: pointer;
       }
 
       @media (max-width: 860px) {
@@ -372,6 +376,7 @@
         justify-content: space-between;
         gap: 10px;
         align-items: center;
+        flex-wrap: wrap;
       }
 
       .card ul {
@@ -381,8 +386,43 @@
         font-size: 0.95rem;
       }
 
-      .card ul[hidden] {
+      .info[hidden] {
         display: none;
+      }
+
+      .info {
+        display: grid;
+        gap: 16px;
+        border-top: 2px solid var(--ink);
+        padding-top: 14px;
+      }
+
+      .info h4 {
+        margin: 0 0 6px;
+        font: 800 0.8rem var(--mono);
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--accent);
+      }
+
+      .info ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--ink);
+        font-size: 0.95rem;
+      }
+
+      .info li {
+        margin-bottom: 6px;
+      }
+
+      .info .note {
+        margin: 0;
+        padding: 10px 12px;
+        border: 2px solid var(--ink);
+        background: var(--bg);
+        color: var(--ink);
+        font-size: 0.9rem;
       }
 
       .card .btn {
@@ -394,6 +434,81 @@
         grid-column: 1 / -1;
         padding: 28px;
         text-align: center;
+      }
+
+      .course-dialog {
+        width: min(900px, calc(100% - 32px));
+        max-height: min(90vh, 900px);
+        padding: 0;
+        border: var(--line) solid var(--ink);
+        background: var(--card);
+        color: var(--ink);
+        box-shadow: 8px 8px 0 var(--ink);
+      }
+
+      .course-dialog::backdrop {
+        background: rgb(0 0 0 / 75%);
+      }
+
+      .dialog-content {
+        display: grid;
+        gap: 18px;
+        padding: clamp(18px, 4vw, 32px);
+      }
+
+      .dialog-heading {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .dialog-close {
+        flex: 0 0 auto;
+        font: 800 1.2rem var(--mono);
+        padding: 6px 12px;
+        border: 2px solid var(--ink);
+        background: var(--card);
+        color: var(--ink);
+        cursor: pointer;
+      }
+
+      .course-video {
+        display: block;
+        width: 100%;
+        max-height: 58vh;
+        background: #000;
+      }
+
+      .certificate-form {
+        display: grid;
+        gap: 12px;
+      }
+
+      .certificate-form label {
+        font-weight: 800;
+      }
+
+      .certificate-form input {
+        width: 100%;
+        font: 700 1rem var(--sans);
+        padding: 12px;
+        border: 2px solid var(--ink);
+        background: var(--bg);
+        color: var(--ink);
+      }
+
+      .certificate-download[hidden],
+      .certificate-form[hidden],
+      .course-video[hidden],
+      .video-instructions[hidden] {
+        display: none;
+      }
+
+      .dialog-status {
+        min-height: 1.5em;
+        margin: 0;
+        color: var(--mute);
       }
 
       @media (max-width: 960px) {
@@ -410,48 +525,6 @@
         .search {
           margin-left: 0;
           width: 100%;
-        }
-      }
-
-      .path {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0;
-        margin-top: clamp(28px, 5vw, 48px);
-        box-shadow: var(--shadow);
-      }
-
-      .path div {
-        padding: 22px;
-        border: var(--line) solid var(--ink);
-        margin: 0 -3px -3px 0;
-        background: var(--card);
-      }
-
-      .path b {
-        font: 900 3rem/1 var(--mono);
-        color: var(--accent);
-        -webkit-text-stroke: 2px var(--ink);
-      }
-
-      .path h3 {
-        margin: 8px 0;
-      }
-
-      .path p {
-        margin: 0;
-        color: var(--mute);
-      }
-
-      @media (max-width: 860px) {
-        .path {
-          grid-template-columns: 1fr 1fr;
-        }
-      }
-
-      @media (max-width: 520px) {
-        .path {
-          grid-template-columns: 1fr;
         }
       }
 
@@ -557,18 +630,18 @@
           <span class="tag mono">SYS.02 // TRAINING</span>
           <h1>COURSES</h1>
           <p class="lead">
-            Learn how disaster zones get mapped, from reading a TRACE map to running the rovers behind it.
+            Learn to use TRACE, and learn how to stay safe when an earthquake, fire or flood hits.
           </p>
 
           <div style="display: flex; flex-wrap: wrap; gap: 14px;">
             <a class="btn" href="#catalog">Browse courses</a>
-            <a class="btn alt" href="#path">See learning path</a>
+            <a class="btn alt" href="chat.html">Ask the AI chatbot</a>
           </div>
 
           <div class="stats mono" aria-label="Course summary">
             <div><b id="sCount">0</b>Courses</div>
-            <div><b>3</b>Levels</div>
-            <div><b>3</b>Audiences</div>
+            <div><b id="sPlatform">0</b>Guides</div>
+            <div><b id="sSurvival">0</b>Disasters</div>
           </div>
         </div>
       </section>
@@ -580,9 +653,8 @@
 
           <div class="bar" role="group" aria-label="Filter courses">
             <button class="chip" data-f="All" aria-pressed="true">All</button>
-            <button class="chip" data-f="Civilians" aria-pressed="false">Civilians</button>
-            <button class="chip" data-f="Responders" aria-pressed="false">Responders</button>
-            <button class="chip" data-f="Builders" aria-pressed="false">Builders</button>
+            <button class="chip" data-f="Guide" aria-pressed="false">Guides</button>
+            <button class="chip" data-f="Disaster" aria-pressed="false">Disasters</button>
             <input class="search" id="q" type="search" placeholder="SEARCH COURSES" aria-label="Search courses">
           </div>
 
@@ -590,44 +662,38 @@
         </div>
       </section>
 
-      <section id="path">
-        <div class="wrap">
-          <span class="tag mono">02 // Learning path</span>
-          <h2 class="rv">From first map to field work.</h2>
-
-          <div class="path rv">
-            <div>
-              <b>01</b>
-              <h3>Understand</h3>
-              <p>Learn what the platform shows and how to read it.</p>
-            </div>
-            <div>
-              <b>02</b>
-              <h3>Interpret</h3>
-              <p>Turn terrain data and hazard flags into decisions.</p>
-            </div>
-            <div>
-              <b>03</b>
-              <h3>Operate</h3>
-              <p>Plan rover runs and use the software to fuse data.</p>
-            </div>
-            <div>
-              <b>04</b>
-              <h3>Build</h3>
-              <p>Assemble low-cost mapping hardware of your own.</p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       <section class="final">
         <div class="wrap">
-          <span class="tag mono">03 // Get started</span>
-          <h2>Know before you go in.</h2>
-          <a class="btn" href="https://traceresponse.vercel.app">Ask the AI chatbot →</a>
+          <span class="tag mono">02 // Need help?</span>
+          <h2>Know what you're getting into.</h2>
+          <a class="btn" href="chat.html">Ask the AI chatbot →</a>
         </div>
       </section>
     </main>
+
+    <dialog class="course-dialog" id="fireDialog" aria-labelledby="fireDialogTitle">
+      <div class="dialog-content">
+        <div class="dialog-heading">
+          <div>
+            <span class="tag mono">COURSE // FIRE SAFETY</span>
+            <h2 id="fireDialogTitle">How to survive a fire</h2>
+          </div>
+          <button class="dialog-close" type="button" aria-label="Close course">×</button>
+        </div>
+        <p class="video-instructions" id="videoInstructions">Watch the video to the end to unlock your certificate.</p>
+        <video class="course-video" id="fireVideo" controls preload="metadata" playsinline>
+          <source src="course-vid/fire.mp4" type="video/mp4">
+          Your browser does not support HTML video.
+        </video>
+        <form class="certificate-form" id="certificateForm" hidden>
+          <label for="certificateName">Enter your name for your certificate</label>
+          <input id="certificateName" name="name" autocomplete="name" maxlength="80" required>
+          <button class="btn" type="submit">Create certificate</button>
+        </form>
+        <a class="btn certificate-download" id="certificateDownload" hidden>Download your certificate</a>
+        <p class="dialog-status" id="dialogStatus" aria-live="polite"></p>
+      </div>
+    </dialog>
 
     <footer>
       <div class="wrap foot">
@@ -641,9 +707,9 @@
         <nav aria-label="Footer">
           <a href="index.html#top">Home</a>
           <a href="courses.html">Courses</a>
-          <a href="index.html#features">News</a>
+          <a href="news.html">News</a>
           <a href="index.html#interface">Software</a>
-          <a href="index.html#about">About Us</a>
+          <a href="about.html">About Us</a>
           <a href="chat.html">Chat</a>
         </nav>
       </div>
@@ -681,60 +747,77 @@
 
       const COURSES = [
         {
-          t: 'Reading a TRACE map',
-          a: 'Civilians',
-          l: 'Beginner',
-          d: '2 hrs',
-          s: 'How to read scanned areas, hazard flags and live updates on the platform.',
-          m: ['What the map shows', 'Scanned vs hazard zones', 'Reading live updates', 'Staying safe with the data']
+          t: 'Responder\'s Guide',
+          a: 'Guide',
+          s: 'How to download and use our software.',
+          learn: [
+            'How to download the TRACE software',
+            'How to install and open it',
+            'How to read the map and hazard flags',
+            'How to use the software with rover data'
+          ]
         },
         {
-          t: 'Disaster awareness basics',
-          a: 'Civilians',
-          l: 'Beginner',
-          d: '3 hrs',
-          s: 'Understand common disaster types and how remote mapping supports response.',
-          m: ['Disaster types', 'Why recon matters', 'Using online updates', 'Family preparedness']
+          t: 'Civilian\'s Guide',
+          a: 'Guide',
+          s: 'How to use our website and AI chatbot.',
+          learn: [
+            'How to find your way around the website',
+            'How to check live disaster updates',
+            'How to ask the AI chatbot the right questions',
+            'How to get clear, useful answers from it'
+          ]
         },
         {
-          t: 'Situational data for responders',
-          a: 'Responders',
-          l: 'Intermediate',
-          d: '4 hrs',
-          s: 'Turn terrain conditions and rover data into field decisions.',
-          m: ['Terrain condition metrics', 'Prioritising hazards', 'Sharing maps with teams', 'Case walkthroughs']
+          t: 'Earthquake',
+          a: 'Disaster',
+          s: 'How to survive an earthquake, from preparing to staying safe afterwards.',
+          learn: [
+            'How to get your home and family ready',
+            'How to protect yourself when the ground shakes',
+            'How to stay safe indoors, outdoors and in a vehicle',
+            'How to act after the shaking stops'
+          ]
         },
         {
-          t: 'Rover operations',
-          a: 'Responders',
-          l: 'Advanced',
-          d: '6 hrs',
-          s: 'Plan and run rover deployments in inaccessible areas.',
-          m: ['Deployment planning', 'Remote control basics', 'Sensor and camera checks', 'Recovery procedures']
+          t: 'Fires',
+          a: 'Disaster',
+          s: 'How to survive a fire and get out safely.',
+          learn: [
+            'How to prepare an escape plan',
+            'How to get out fast and stay low in smoke',
+            'How to stay safe if you are trapped',
+            'How to treat burns and get help'
+          ]
         },
         {
-          t: 'TRACE software workshop',
-          a: 'Builders',
-          l: 'Intermediate',
-          d: '5 hrs',
-          s: 'Install the custom software and fuse rover data into one picture.',
-          m: ['Install and setup', 'Importing rover data', 'Merging sensor streams', 'Publishing to the platform']
-        },
-        {
-          t: 'Build a low-cost mapper',
-          a: 'Builders',
-          l: 'Advanced',
-          d: '8 hrs',
-          s: 'Assemble affordable mapping hardware with sensors and cameras.',
-          m: ['Parts and budget', 'Sensor wiring', 'Calibration', 'Field testing']
+          t: 'Floods',
+          a: 'Disaster',
+          s: 'How to survive a flood and protect your family when the water rises.',
+          learn: [
+            'How to prepare before a flood warning',
+            'How to move to safety when water rises',
+            'How to avoid the dangers of floodwater',
+            'How to return home safely afterwards'
+          ]
         }
       ];
 
       const grid = document.getElementById('grid');
       const q = document.getElementById('q');
+      const fireDialog = document.getElementById('fireDialog');
+      const fireVideo = document.getElementById('fireVideo');
+      const certificateForm = document.getElementById('certificateForm');
+      const certificateName = document.getElementById('certificateName');
+      const certificateDownload = document.getElementById('certificateDownload');
+      const videoInstructions = document.getElementById('videoInstructions');
+      const dialogStatus = document.getElementById('dialogStatus');
+      let certificateUrl = '';
       let filter = 'All';
 
       document.getElementById('sCount').textContent = COURSES.length;
+      document.getElementById('sPlatform').textContent = COURSES.filter((c) => c.a === 'Guide').length;
+      document.getElementById('sSurvival').textContent = COURSES.filter((c) => c.a === 'Disaster').length;
 
       function render() {
         const term = q.value.trim().toLowerCase();
@@ -744,31 +827,33 @@
         grid.innerHTML = '';
 
         if (!list.length) {
-          grid.innerHTML = '<div class="box empty mono">No courses match. Clear the search or pick another audience.</div>';
+          grid.innerHTML = '<div class="box empty mono">No courses match. Clear the search or pick another category.</div>';
           return;
         }
 
         list.forEach((course) => {
           const element = document.createElement('article');
           element.className = 'box card';
+
           element.innerHTML = `
             <span class="n">${String(course.index + 1).padStart(2, '0')}</span>
             <h3>${course.t}</h3>
             <p>${course.s}</p>
             <div class="meta mono">
               <span>${course.a}</span>
-              <span>${course.l}</span>
-              <span>${course.d}</span>
             </div>
-            <ul id="m${course.index}" hidden>${course.m.map((item) => `<li>${item}</li>`).join('')}</ul>
+            <div class="info" id="m${course.index}" hidden>
+              <h4>What you'll learn</h4>
+              <ul>${course.learn.map((item) => `<li>${item}</li>`).join('')}</ul>
+            </div>
             <div class="more">
-              <button class="chip" aria-expanded="false" aria-controls="m${course.index}">Syllabus</button>
-              <a class="btn" href="https://traceresponse.vercel.app">Enroll</a>
+              <button class="chip" aria-expanded="false" aria-controls="m${course.index}">What you'll learn</button>
+              ${course.t === 'Fires' ? '<button class="btn start-course" type="button">Start</button>' : ''}
             </div>
           `;
 
           const button = element.querySelector('.chip');
-          const listElement = element.querySelector('ul');
+          const listElement = element.querySelector('.info');
 
           button.onclick = () => {
             const isOpen = listElement.hidden;
@@ -776,9 +861,105 @@
             button.setAttribute('aria-expanded', isOpen);
           };
 
+          const startButton = element.querySelector('.start-course');
+          if (startButton) {
+            startButton.onclick = () => {
+              resetFireCourse();
+              fireDialog.showModal();
+            };
+          }
+
           grid.appendChild(element);
         });
       }
+
+      function resetFireCourse() {
+        fireVideo.pause();
+        fireVideo.currentTime = 0;
+        fireVideo.hidden = false;
+        certificateForm.hidden = true;
+        certificateForm.reset();
+        certificateName.value = '';
+        certificateDownload.hidden = true;
+        certificateDownload.removeAttribute('href');
+        videoInstructions.hidden = false;
+        dialogStatus.textContent = '';
+        if (certificateUrl) {
+          URL.revokeObjectURL(certificateUrl);
+          certificateUrl = '';
+        }
+      }
+
+      fireVideo.addEventListener('ended', () => {
+        fireVideo.hidden = true;
+        videoInstructions.hidden = true;
+        certificateForm.hidden = false;
+        certificateName.focus();
+        dialogStatus.textContent = 'Video complete. Add your name to create your certificate.';
+      });
+
+      certificateName.addEventListener('input', () => certificateName.setCustomValidity(''));
+
+      certificateForm.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        const name = certificateName.value.trim();
+        if (!name) {
+          certificateName.setCustomValidity('Enter your name to create the certificate.');
+          certificateName.reportValidity();
+          return;
+        }
+        certificateName.setCustomValidity('');
+
+        try {
+          const image = new Image();
+          image.src = 'cert/cert-fire.jpg';
+          await image.decode();
+          const imperialScriptFaces = await document.fonts.load('300px "Imperial Script"');
+          if (!imperialScriptFaces.length) {
+            throw new Error('The Imperial Script font could not be loaded.');
+          }
+          const canvas = document.createElement('canvas');
+          canvas.width = image.naturalWidth;
+          canvas.height = image.naturalHeight;
+          const context = canvas.getContext('2d');
+          if (!context) {
+            throw new Error('Could not prepare the certificate image.');
+          }
+
+          context.drawImage(image, 0, 0);
+          context.textAlign = 'center';
+          context.textBaseline = 'middle';
+          context.fillStyle = '#ffffff';
+          context.shadowColor = '#000000';
+          context.shadowBlur = 4;
+          let fontSize = 220;
+          context.font = `${fontSize}px "Imperial Script", cursive`;
+          while (context.measureText(name).width > canvas.width * 0.82 && fontSize > 48) {
+            fontSize -= 2;
+            context.font = `${fontSize}px "Imperial Script", cursive`;
+          }
+          context.fillText(name, canvas.width / 2, canvas.height * 0.71, canvas.width * 0.86);
+
+          const blob = await new Promise((resolve) => canvas.toBlob(resolve, 'image/png'));
+          if (!blob) {
+            throw new Error('Could not create the certificate download.');
+          }
+
+          if (certificateUrl) URL.revokeObjectURL(certificateUrl);
+          certificateUrl = URL.createObjectURL(blob);
+          const filename = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'learner';
+          certificateDownload.href = certificateUrl;
+          certificateDownload.download = `fire-certificate-${filename}.png`;
+          certificateDownload.hidden = false;
+          dialogStatus.textContent = 'Your named certificate is ready to download.';
+        } catch (error) {
+          dialogStatus.textContent = `Could not create the certificate: ${error.message}`;
+          console.error('Certificate generation failed:', error);
+        }
+      });
+
+      fireDialog.querySelector('.dialog-close').addEventListener('click', () => fireDialog.close());
+      fireDialog.addEventListener('close', resetFireCourse);
 
       document.querySelectorAll('.bar .chip').forEach((button) => {
         button.onclick = () => {
