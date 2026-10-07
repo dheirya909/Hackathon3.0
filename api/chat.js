@@ -1,6 +1,6 @@
 // pages/api/chat.js (Next.js Pages Router) or standard Node.js serverless route
 
-const MODEL = "gemini-2.5-flash"; // Recommended model for standard fast chat completions
+const MODEL = "gemini-3.5-flash-lite"; // Recommended model for standard fast chat completions
 
 const SYSTEM_PROMPT = `
 You are TRACE Assistant, the dedicated AI assistant for TRACE (Tactical Reconnaissance and Assessment for Critical Environments).
