@@ -1,4 +1,4 @@
-const MODEL = "gemini-3.8-flash";
+const MODEL = "gemini-3.5-flash-lite";
 
 const SYSTEM_PROMPT =
   "You are the TRACE assistant. TRACE (Tactical Reconnaissance and Assessment for Critical Environments) " +
