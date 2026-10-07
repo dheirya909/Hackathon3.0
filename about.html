@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>About Us — TRACE</title>
+    <meta name="description" content="About TRACE: who we are, why we built two rovers for disaster response, and how to reach us.">
+    <link rel="icon" type="image/x-icon" href="/logo.png">
+    <style>
+      :root {
+        --bg: #ece9e1;
+        --ink: #0d0d0d;
+        --card: #f7f5ef;
+        --accent: #ff4f00;
+        --mute: #5b5a55;
+        --line: 3px;
+        --sp: clamp(16px, 3vw, 32px);
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --sans: "Helvetica Neue", Arial, system-ui, sans-serif;
+        --shadow: 6px 6px 0 var(--ink);
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #111110;
+          --ink: #f1eee6;
+          --card: #1a1a18;
+          --mute: #a09e94;
+        }
+      }
+
+      :root[data-theme="dark"] {
+        --bg: #111110;
+        --ink: #f1eee6;
+        --card: #1a1a18;
+        --mute: #a09e94;
+      }
+
+      *, *::before, *::after {
+        box-sizing: inherit;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: calc(80px + env(safe-area-inset-top, 0px));
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 400 17px/1.5 var(--sans);
+        background-image: linear-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      a { color: inherit; }
+
+      :focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 var(--sp);
+      }
+
+      .mono {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      section {
+        padding: clamp(56px, 9vw, 110px) 0;
+        border-top: var(--line) solid var(--ink);
+      }
+
+      h1, h2, h3 {
+        margin: 0;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        font-weight: 900;
+      }
+
+      h1 { font-size: clamp(3.4rem, 13vw, 9.5rem); }
+      h2 { font-size: clamp(2.2rem, 6vw, 4.4rem); max-width: 16ch; }
+      h3 { font-size: 1.4rem; letter-spacing: -0.01em; }
+
+      .tag {
+        display: inline-block;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 3px 9px;
+        margin-bottom: 18px;
+      }
+
+      .box {
+        background: var(--card);
+        border: var(--line) solid var(--ink);
+        border-radius: 2px;
+      }
+
+      .btn {
+        display: inline-block;
+        font: 800 0.95rem var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        padding: 14px 22px;
+        border: var(--line) solid var(--ink);
+        background: var(--accent);
+        color: #0d0d0d;
+        box-shadow: 4px 4px 0 var(--ink);
+        transition: transform 0.12s, box-shadow 0.12s;
+        cursor: pointer;
+      }
+
+      .btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+      .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+      .btn.alt { background: var(--card); color: var(--ink); }
+
+      /* Header */
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--bg);
+        border-bottom: var(--line) solid var(--ink);
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        height: 64px;
+      }
+
+      .logo {
+        font-weight: 900;
+        font-size: 1.5rem;
+        text-decoration: none;
+        letter-spacing: -0.04em;
+      }
+
+      .logo b { color: var(--accent); }
+
+      .links {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+        align-items: center;
+      }
+
+      .links a {
+        font: 700 0.8rem var(--mono);
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 8px 10px;
+        border: 2px solid transparent;
+      }
+
+      .links a:hover,
+      .links a[aria-current="page"] { border-color: var(--ink); }
+
+      .links .btn {
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        margin-left: 8px;
+      }
+
+      .menu {
+        display: none;
+        margin-left: auto;
+        font: 800 0.8rem var(--mono);
+        background: var(--card);
+        color: var(--ink);
+        border: var(--line) solid var(--ink);
+        padding: 9px 12px;
+        cursor: pointer;
+      }
+
+      @media (max-width: 860px) {
+        .menu { display: block; }
+
+        .links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: stretch;
+          background: var(--bg);
+          border-bottom: var(--line) solid var(--ink);
+          padding: 12px var(--sp);
+          margin: 0;
+        }
+
+        .links.open { display: flex; }
+
+        .links a {
+          padding: 14px 8px;
+          border-bottom: 2px solid var(--ink);
+        }
+
+        .links .btn { margin: 12px 0 0; text-align: center; }
+      }
+
+      /* Hero */
+      .hero {
+        border-top: 0;
+        padding-top: clamp(32px, 6vw, 72px);
+      }
+
+      .hero p.lead {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        max-width: 38ch;
+        margin: 22px 0 0;
+      }
+
+      /* Two-column text blocks */
+      .split {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: var(--sp);
+      }
+
+      .split .copy {
+        display: grid;
+        gap: 18px;
+        font-size: 1.15rem;
+      }
+
+      .split .copy p {
+        margin: 0;
+        padding-left: 16px;
+        border-left: var(--line) solid var(--accent);
+      }
+
+
+      .split .copy p.big {
+        font-size: clamp(1.35rem, 2.6vw, 1.85rem);
+        line-height: 1.25;
+        letter-spacing: -0.015em;
+        font-weight: 700;
+      }
+
+      .split .copy p { max-width: 52ch; }
+      .split .copy strong { background: linear-gradient(transparent 62%, color-mix(in srgb, var(--accent) 45%, transparent) 62%); }
+
+      @media (max-width: 860px) {
+        .split { grid-template-columns: 1fr; }
+      }
+
+      /* Cards */
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp);
+        margin-top: clamp(28px, 5vw, 48px);
+      }
+
+      .card {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        min-height: 200px;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+
+      .card:hover {
+        transform: translate(-4px, -4px);
+        box-shadow: var(--shadow);
+      }
+
+      .card p { margin: 0; color: var(--mute); }
+
+      .card .mono {
+        margin-top: auto;
+        border-top: 2px solid var(--ink);
+        padding-top: 10px;
+      }
+
+
+      @media (max-width: 960px) {
+        .grid { grid-template-columns: 1fr 1fr; }
+      }
+
+      @media (max-width: 600px) {
+        .grid { grid-template-columns: 1fr; }
+        .card { min-height: 0; }
+      }
+
+
+      /* Final CTA */
+      .final {
+        background: var(--accent);
+        color: #0d0d0d;
+      }
+
+      .final h2 {
+        max-width: 14ch;
+        font-size: clamp(2.6rem, 8vw, 6.5rem);
+      }
+
+      .final .btn {
+        background: #0d0d0d;
+        color: #f1eee6;
+        border-color: #0d0d0d;
+        box-shadow: 5px 5px 0 #f1eee6;
+        margin-top: 28px;
+      }
+
+      .final .btn:hover { box-shadow: 8px 8px 0 #f1eee6; }
+      .final .tag { background: #0d0d0d; color: #f1eee6; }
+
+      /* Footer */
+      footer {
+        border-top: var(--line) solid var(--ink);
+        padding: 36px 0 48px;
+      }
+
+      .foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: space-between;
+        align-items: end;
+      }
+
+      .foot nav {
+        height: auto;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .foot a {
+        font: 700 0.8rem var(--mono);
+        text-transform: uppercase;
+      }
+
+      /* Reveal */
+      .rv {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.5s, transform 0.5s;
+      }
+
+      .rv.on { opacity: 1; transform: none; }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto;
+        }
+
+        .rv { opacity: 1; transform: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <nav aria-label="Primary">
+          <a class="logo" href="index.html#top">TRACE<b>.</b></a>
+          <button class="menu" aria-expanded="false" aria-controls="links">MENU</button>
+          <div class="links" id="links">
+            <a href="index.html#top">Home</a>
+            <a href="courses.html">Courses</a>
+            <a href="news.html">News</a>
+            <a href="index.html#interface">Software</a>
+            <a href="about.html" aria-current="page">About Us</a>
+            <a class="btn" href="https://traceresponse.vercel.app">AI Chatbot</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="wrap">
+          <span class="tag mono">About us</span>
+          <h1>About TRACE</h1>
+          <p class="lead">Two rovers go in first, so rescuers know what is safe before they follow.</p>
+        </div>
+      </section>
+
+      <section id="mission">
+        <div class="wrap split">
+          <div class="rv">
+            <span class="tag mono">The problem</span>
+            <h2>Rescuers shouldn’t enter blind.</h2>
+          </div>
+          <div class="copy rv">
+            <p class="big">When an earthquake, fire or flood hits, rescue teams have to enter damaged buildings without knowing which routes are safe.</p>
+            <p>They can’t see structural hazards or which zones are already cleared. That uncertainty puts lives at risk, and most of it is avoidable.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="solution">
+        <div class="wrap split">
+          <div class="rv">
+            <span class="tag mono">Our solution</span>
+            <h2>Two rovers go in first.</h2>
+          </div>
+          <div class="copy rv">
+            <p class="big">TRACE is an <strong>offline, affordable, two-rover system</strong> that scouts high-risk indoor spaces and maps hazards in real time.</p>
+            <p>Two identical rovers inspect accessible areas side by side and send what they see to a <strong>single local command post</strong>.</p>
+            <p>Sensors, cameras and our own low-cost mapping technology capture conditions inside. Our software merges everything into one clear picture, shared online with <strong>responders and civilians</strong>.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="principles">
+        <div class="wrap">
+          <span class="tag mono">Key features</span>
+          <h2 class="rv">What TRACE does.</h2>
+          <div class="grid">
+            <article class="box card rv">
+              <h3>Real-time hazard mapping</h3>
+              <p>Hazards and cleared zones show up on one map as the rovers move through the building.</p>
+              <span class="mono">Mapping</span>
+            </article>
+            <article class="box card rv">
+              <h3>Autonomous navigation with manual override</h3>
+              <p>The rovers navigate on their own, and an operator can take control at any time.</p>
+              <span class="mono">Control</span>
+            </article>
+            <article class="box card rv">
+              <h3>Responder telemetry and public updates</h3>
+              <p>Response teams get live rover data, and civilians can see public situation updates.</p>
+              <span class="mono">Access</span>
+            </article>
+          </div>
+        </div>
+      </section>
+
+      <section class="final">
+        <div class="wrap">
+          <span class="tag mono">Try it</span>
+          <h2>See the platform.</h2>
+          <a class="btn" href="https://traceresponse.vercel.app">Visit TRACE</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap foot">
+        <div>
+          <a class="logo" href="index.html">TRACE<b>.</b></a>
+          <p class="mono" style="margin: 8px 0 0; color: var(--mute);">Tactical Reconnaissance and Assessment for Critical Environments</p>
+        </div>
+        <nav aria-label="Footer">
+          <a href="index.html">Home</a>
+          <a href="courses.html">Courses</a>
+          <a href="index.html#features">News</a>
+          <a href="index.html#interface">Software</a>
+          <a href="about.html">About Us</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script>
+      const menu = document.querySelector('.menu');
+      const links = document.getElementById('links');
+
+      menu.onclick = () => {
+        const open = links.classList.toggle('open');
+        menu.setAttribute('aria-expanded', open);
+      };
+
+      links.addEventListener('click', (event) => {
+        if (event.target.tagName === 'A') {
+          links.classList.remove('open');
+          menu.setAttribute('aria-expanded', false);
+        }
+      });
+
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('on');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.15 });
+
+      document.querySelectorAll('.rv').forEach((element) => io.observe(element));
+    </script>
+  </body>
+</html>

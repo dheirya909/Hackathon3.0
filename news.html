@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>News — TRACE</title>
+    <meta name="description" content="Latest updates from the TRACE rovers.">
+    <style>
+      :root {
+        --bg: #ece9e1; --ink: #0d0d0d; --card: #f7f5ef; --accent: #ff4f00; --mute: #5b5a55;
+        --line: 3px; --sp: clamp(16px, 3vw, 32px);
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --sans: "Helvetica Neue", Arial, system-ui, sans-serif;
+        --shadow: 6px 6px 0 var(--ink);
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) { --bg: #111110; --ink: #f1eee6; --card: #1a1a18; --mute: #a09e94; }
+      }
+      :root[data-theme="dark"] { --bg: #111110; --ink: #f1eee6; --card: #1a1a18; --mute: #a09e94; }
+      *, *::before, *::after { box-sizing: inherit; }
+      html { scroll-behavior: smooth; scroll-padding-top: calc(80px + env(safe-area-inset-top, 0px)); }
+      body {
+        margin: 0; background: var(--bg); color: var(--ink); font: 400 17px/1.5 var(--sans);
+        background-image: linear-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+      a { color: inherit; }
+      :focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+      .wrap { max-width: 1180px; margin: 0 auto; padding: 0 var(--sp); }
+      .mono { font-family: var(--mono); font-size: 0.78rem; letter-spacing: 0.08em; text-transform: uppercase; }
+      h1, h2, h3 { margin: 0; line-height: 0.95; letter-spacing: -0.03em; font-weight: 900; }
+      h1 { font-size: clamp(3.6rem, 13vw, 9rem); }
+      h3 { font-size: 1.5rem; letter-spacing: -0.01em; line-height: 1.05; }
+      .tag { display: inline-block; background: var(--ink); color: var(--bg); padding: 3px 9px; margin-bottom: 18px; }
+      .box { background: var(--card); border: var(--line) solid var(--ink); border-radius: 2px; }
+      .btn {
+        display: inline-block; font: 800 0.95rem var(--mono); text-transform: uppercase; letter-spacing: 0.06em;
+        text-decoration: none; padding: 14px 22px; border: var(--line) solid var(--ink); background: var(--accent);
+        color: #0d0d0d; box-shadow: 4px 4px 0 var(--ink); transition: transform 0.12s, box-shadow 0.12s; cursor: pointer;
+      }
+      .btn:hover { transform: translate(-2px, -2px); box-shadow: 7px 7px 0 var(--ink); }
+      .btn:active { transform: translate(3px, 3px); box-shadow: 1px 1px 0 var(--ink); }
+
+      header { position: sticky; top: 0; z-index: 20; background: var(--bg); border-bottom: var(--line) solid var(--ink); padding-top: env(safe-area-inset-top, 0px); }
+      nav { display: flex; align-items: center; gap: 20px; height: 64px; }
+      .logo { font-weight: 900; font-size: 1.5rem; text-decoration: none; letter-spacing: -0.04em; }
+      .logo b { color: var(--accent); }
+      .links { display: flex; gap: 4px; margin-left: auto; align-items: center; }
+      .links a { font: 700 0.8rem var(--mono); text-transform: uppercase; text-decoration: none; padding: 8px 10px; border: 2px solid transparent; }
+      .links a:hover, .links a[aria-current="page"] { border-color: var(--ink); }
+      .links .btn { padding: 9px 14px; font-size: 0.8rem; margin-left: 8px; }
+      .menu { display: none; margin-left: auto; font: 800 0.8rem var(--mono); background: var(--card); color: var(--ink); border: var(--line) solid var(--ink); padding: 9px 12px; }
+      @media (max-width: 860px) {
+        .menu { display: block; }
+        .links { display: none; position: absolute; top: 100%; left: 0; right: 0; flex-direction: column; align-items: stretch; background: var(--bg); border-bottom: var(--line) solid var(--ink); padding: 12px var(--sp); margin: 0; }
+        .links.open { display: flex; }
+        .links a { padding: 14px 8px; border-bottom: 2px solid var(--ink); }
+        .links .btn { margin: 12px 0 0; text-align: center; }
+      }
+
+      .hero { padding: clamp(32px, 6vw, 72px) 0 clamp(24px, 4vw, 40px); }
+      .hero p.lead { font-size: clamp(1.1rem, 2vw, 1.4rem); max-width: 40ch; margin: 22px 0 0; padding-left: 16px; border-left: var(--line) solid var(--accent); }
+      h1 b { color: var(--accent); }
+      ::selection { background: var(--accent); color: #0d0d0d; }
+      .status { display: flex; flex-wrap: wrap; gap: 0; margin-top: 32px; border: var(--line) solid var(--ink); background: var(--ink); color: var(--bg); }
+      .status > span { padding: 10px 18px; border-right: 2px solid var(--bg); }
+      .status > span:last-child { border-right: 0; }
+      .dot { display: inline-block; width: 10px; height: 10px; background: var(--accent); margin-right: 8px; animation: pulse 1.4s steps(2) infinite; }
+      .dot.off { animation: none; background: var(--mute); }
+      @keyframes pulse { 50% { opacity: 0.2; } }
+
+      .filters { display: flex; flex-wrap: wrap; gap: 10px; padding: 24px 0; border-top: var(--line) solid var(--ink); position: relative; }
+      .filters::before { content: ""; position: absolute; top: calc(var(--line) * -1); left: 0; width: 96px; height: var(--line); background: var(--accent); }
+      .fbtn { font: 800 0.8rem var(--mono); text-transform: uppercase; padding: 10px 14px; border: var(--line) solid var(--ink); background: var(--card); color: var(--ink); cursor: pointer; }
+      .fbtn:hover { background: var(--accent); color: #0d0d0d; }
+      .fbtn[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
+
+      .feed { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--sp); padding-bottom: clamp(56px, 9vw, 110px); }
+      .feed .lead-post { grid-column: 1 / -1; }
+      .post { border-left: 6px solid var(--accent); padding: 24px; display: flex; flex-direction: column; gap: 14px; transition: transform 0.15s, box-shadow 0.15s; animation: in 0.4s both; }
+      .post:hover { transform: translate(-4px, -4px); box-shadow: var(--shadow); }
+      .lead-post { border-top: 6px solid var(--accent); }
+      .lead-post h3 { font-size: clamp(2rem, 5vw, 3.4rem); }
+      .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+      .pill { border: 2px solid var(--ink); padding: 2px 8px; }
+      .pill.rv { background: var(--accent); color: #0d0d0d; }
+      .post p { margin: 0; color: var(--mute); }
+      .post .body { color: var(--ink); }
+      .details { margin: 4px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); border: 2px solid var(--ink); }
+      .details div { padding: 9px 12px; border-right: 2px solid var(--ink); border-bottom: 2px solid var(--ink); margin: 0 -2px -2px 0; }
+      .details dt::before { content: ""; display: inline-block; width: 6px; height: 6px; background: var(--accent); margin-right: 6px; }
+      .details dt { font: 700 0.68rem var(--mono); text-transform: uppercase; letter-spacing: 0.08em; color: var(--mute); }
+      .details dd { margin: 2px 0 0; font: 800 0.95rem var(--mono); word-break: break-word; }
+      .readmore { align-self: flex-start; font: 800 0.8rem var(--mono); text-transform: uppercase; background: none; border: 0; border-bottom: 3px solid var(--accent); color: var(--ink); padding: 2px 0; cursor: pointer; }
+      .body[hidden] { display: none; }
+      @keyframes in { from { opacity: 0; transform: translateY(14px); } }
+
+      .state { grid-column: 1 / -1; padding: 40px; text-align: center; }
+      .state.err { background: var(--accent); color: #0d0d0d; }
+      .skel { min-height: 160px; background: linear-gradient(90deg, var(--card) 0%, color-mix(in srgb, var(--ink) 8%, var(--card)) 50%, var(--card) 100%); background-size: 200% 100%; animation: sh 1.2s linear infinite; }
+      @keyframes sh { to { background-position: -200% 0; } }
+      @media (max-width: 860px) { .feed { grid-template-columns: 1fr; } }
+
+      footer { border-top: var(--line) solid var(--ink); padding: 36px 0 48px; }
+      .foot { display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: end; }
+      .foot nav { height: auto; gap: 18px; flex-wrap: wrap; }
+      .foot a { font: 700 0.8rem var(--mono); text-transform: uppercase; }
+      .foot nav a:hover { color: var(--accent); }
+      footer { border-top-color: var(--accent); }
+
+      @media (prefers-reduced-motion: reduce) {
+        * { animation: none !important; transition: none !important; scroll-behavior: auto; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="wrap">
+        <nav aria-label="Primary">
+          <a class="logo" href="index.html#top">TRACE<b>.</b></a>
+          <button class="menu" aria-expanded="false" aria-controls="links">MENU</button>
+          <div class="links" id="links">
+            <a href="index.html#top">Home</a>
+            <a href="courses.html">Courses</a>
+            <a href="news.html" aria-current="page">News</a>
+            <a href="index.html#interface">Software</a>
+            <a href="about.html">About Us</a>
+            <a class="btn" href="https://traceresponse.vercel.app">AI Chatbot</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="wrap">
+          <span class="tag mono">NEWS // LATEST</span>
+          <h1>NEWS<b>.</b></h1>
+          <p class="lead">Fresh updates from the rovers and the platform, as they come in.</p>
+          <div class="status mono" role="status">
+            <span><i class="dot off" id="dot"></i><b id="conn">Connecting</b></span>
+            <span id="count">0 updates</span>
+            <span id="last">Last: --</span>
+          </div>
+        </div>
+      </section>
+
+      <div class="wrap">
+        <div class="filters" id="filters" role="group" aria-label="Filter updates"></div>
+        <div class="feed" id="feed" aria-live="polite">
+          <div class="box skel"></div><div class="box skel"></div><div class="box skel"></div><div class="box skel"></div>
+        </div>
+      </div>
+    </main>
+
+    <footer>
+      <div class="wrap foot">
+        <div>
+          <a class="logo" href="index.html#top">TRACE<b>.</b></a>
+          <p class="mono" style="margin: 8px 0 0; color: var(--mute);">Tactical Reconnaissance and Assessment for Critical Environments</p>
+        </div>
+        <nav aria-label="Footer">
+          <a href="index.html#top">Home</a>
+          <a href="courses.html">Courses</a>
+          <a href="news.html">News</a>
+          <a href="index.html#interface">Software</a>
+          <a href="index.html#about">About Us</a>
+        </nav>
+      </div>
+    </footer>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-app.js";
+      import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
+      import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
+
+      /* ========= 1. FIREBASE CONFIG ========= */
+      const firebaseConfig = {
+        apiKey: "AIzaSyDOt9kRnJpmBcYJW0LzUfB5wtXBFQa98pA",
+        authDomain: "trace-b38df.firebaseapp.com",
+        projectId: "trace-b38df",
+        storageBucket: "trace-b38df.firebasestorage.app",
+        messagingSenderId: "27091131691",
+        appId: "1:27091131691:web:4783102290bee13d50b96e",
+        measurementId: "G-93XR6BE3S9"
+      };
+      /* ========= 2. COLLECTION NAME ========= */
+      const COLLECTION = "news";
+      /* Expected doc fields (all optional except title):
+         title, summary, body, category, rover ("R1"/"R2"), date (Timestamp),
+         battery (number 0-100), terrain (string), area (string) */
+
+      const $ = (id) => document.getElementById(id);
+      const feed = $("feed"), filtersEl = $("filters");
+      let items = [], active = "All";
+
+      const menu = document.querySelector(".menu"), links = $("links");
+      menu.onclick = () => menu.setAttribute("aria-expanded", links.classList.toggle("open"));
+      links.addEventListener("click", (event) => {
+        if (event.target.closest("a")) {
+          links.classList.remove("open");
+          menu.setAttribute("aria-expanded", "false");
+        }
+      });
+
+      /* Partial mask for sensitive-looking values (e.g. "Sector 4B" -> "Se█████ ██") */
+      const mask = (v) => {
+        const s = String(v);
+        return s.slice(0, 2) + s.slice(2).replace(/[^\s]/g, "█");
+      };
+
+      const toDate = (v) => v?.toDate ? v.toDate() : (v ? new Date(v) : null);
+      const fmt = (d) => d ? d.toLocaleString(undefined, { day: "2-digit", month: "short", hour: "2-digit", minute: "2-digit" }) : "";
+
+      function el(tag, cls, text) {
+        const n = document.createElement(tag);
+        if (cls) n.className = cls;
+        if (text != null) n.textContent = text;
+        return n;
+      }
+
+      function card(item, isLead) {
+        const a = el("article", "box post" + (isLead ? " lead-post" : ""));
+        const meta = el("div", "meta mono");
+        if (item.rover) meta.append(el("span", "pill rv", item.rover));
+        if (item.category) meta.append(el("span", "pill", item.category));
+        const d = fmt(item.date);
+        if (d) meta.append(el("span", "", d));
+        a.append(meta, el("h3", "", item.title || "Untitled update"));
+        if (item.summary) a.append(el("p", "", item.summary));
+
+        const rows = [];
+        if (typeof item.battery === "number") rows.push(["Battery", Math.round(item.battery) + "%"]);
+        if (item.terrain) rows.push(["Terrain", item.terrain]);
+        if (item.area) rows.push(["Area", mask(item.area)]);
+        if (rows.length) {
+          const dl = el("dl", "details");
+          rows.forEach(([k, v]) => {
+            const w = el("div");
+            w.append(el("dt", "", k), el("dd", "", v));
+            dl.append(w);
+          });
+          a.append(dl);
+        }
+
+        if (item.body) {
+          const body = el("p", "body", item.body);
+          body.hidden = true;
+          const btn = el("button", "readmore", "Read more");
+          btn.setAttribute("aria-expanded", "false");
+          btn.onclick = () => {
+            body.hidden = !body.hidden;
+            btn.textContent = body.hidden ? "Read more" : "Show less";
+            btn.setAttribute("aria-expanded", String(!body.hidden));
+          };
+          a.append(body, btn);
+        }
+        return a;
+      }
+
+      function renderFilters() {
+        const cats = ["All", ...new Set(items.map((i) => i.category).filter(Boolean))];
+        if (!cats.includes(active)) active = "All";
+        filtersEl.replaceChildren(...cats.map((c) => {
+          const b = el("button", "fbtn", c);
+          b.setAttribute("aria-pressed", String(c === active));
+          b.onclick = () => { active = c; renderFilters(); renderFeed(); };
+          return b;
+        }));
+        filtersEl.hidden = cats.length < 3;
+      }
+
+      function renderFeed() {
+        const list = active === "All" ? items : items.filter((i) => i.category === active);
+        if (!list.length) {
+          feed.replaceChildren(el("div", "box state mono", "No updates yet. Check back soon."));
+          return;
+        }
+        feed.replaceChildren(...list.map((i, idx) => card(i, idx === 0 && active === "All")));
+      }
+
+      function setConn(ok, label) {
+        $("dot").classList.toggle("off", !ok);
+        $("conn").textContent = label;
+      }
+
+      try {
+        const app = initializeApp(firebaseConfig);
+        isSupported().then((ok) => { if (ok) getAnalytics(app); }).catch(() => {});
+        const db = getFirestore(app);
+        const q = query(collection(db, COLLECTION), orderBy("date", "desc"), limit(30));
+        onSnapshot(q, (snap) => {
+          items = snap.docs.map((d) => ({ id: d.id, ...d.data(), date: toDate(d.data().date) }));
+          setConn(true, "Live");
+          $("count").textContent = items.length + (items.length === 1 ? " update" : " updates");
+          $("last").textContent = "Last: " + (items[0]?.date ? fmt(items[0].date) : "--");
+          renderFilters();
+          renderFeed();
+        }, (err) => {
+          console.error(err);
+          setConn(false, "Offline");
+          feed.replaceChildren(el("div", "box state err mono", "Could not load updates. Please try again later."));
+        });
+      } catch (e) {
+        console.error(e);
+        setConn(false, "Offline");
+        feed.replaceChildren(el("div", "box state err mono", "Could not load updates. Please try again later."));
+      }
+    </script>
+  </body>
+</html>

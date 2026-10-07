@@ -1,222 +1,793 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Courses — TRACE</title>
-<meta name="description" content="TRACE courses: learn disaster-response mapping, rover operation and the TRACE software.">
-<style>
-:root{--bg:#ece9e1;--ink:#0d0d0d;--card:#f7f5ef;--accent:#ff4f00;--mute:#5b5a55;--line:3px;--sp:clamp(16px,3vw,32px);--mono:ui-monospace,"SF Mono",Menlo,Consolas,monospace;--sans:"Helvetica Neue",Arial,system-ui,sans-serif;--shadow:6px 6px 0 var(--ink);box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
-@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#111110;--ink:#f1eee6;--card:#1a1a18;--mute:#a09e94}}
-:root[data-theme="dark"]{--bg:#111110;--ink:#f1eee6;--card:#1a1a18;--mute:#a09e94}
-*,*::before,*::after{box-sizing:inherit}
-html{scroll-behavior:smooth;scroll-padding-top:calc(80px + env(safe-area-inset-top,0px))}
-body{margin:0;background:var(--bg);color:var(--ink);font:400 17px/1.5 var(--sans);background-image:linear-gradient(color-mix(in srgb,var(--ink) 7%,transparent) 1px,transparent 1px),linear-gradient(90deg,color-mix(in srgb,var(--ink) 7%,transparent) 1px,transparent 1px);background-size:40px 40px}
-a{color:inherit}
-:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
-.wrap{max-width:1180px;margin:0 auto;padding:0 var(--sp)}
-.mono{font-family:var(--mono);font-size:.78rem;letter-spacing:.08em;text-transform:uppercase}
-section{padding:clamp(56px,9vw,110px) 0;border-top:var(--line) solid var(--ink)}
-h1,h2,h3{margin:0;line-height:.95;letter-spacing:-.03em;font-weight:900}
-h1{font-size:clamp(3.4rem,12vw,9rem)}
-h2{font-size:clamp(2.2rem,6vw,4.4rem);max-width:16ch}
-h3{font-size:1.4rem;letter-spacing:-.01em}
-.tag{display:inline-block;background:var(--ink);color:var(--bg);padding:3px 9px;margin-bottom:18px}
-.box{background:var(--card);border:var(--line) solid var(--ink);border-radius:2px}
-.btn{display:inline-block;font:800 .95rem var(--mono);text-transform:uppercase;letter-spacing:.06em;text-decoration:none;padding:14px 22px;border:var(--line) solid var(--ink);background:var(--accent);color:#0d0d0d;box-shadow:4px 4px 0 var(--ink);transition:transform .12s,box-shadow .12s;cursor:pointer}
-.btn:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
-.btn:active{transform:translate(3px,3px);box-shadow:1px 1px 0 var(--ink)}
-.btn.alt{background:var(--card);color:var(--ink)}
-header{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:var(--line) solid var(--ink);padding-top:env(safe-area-inset-top,0px)}
-nav{display:flex;align-items:center;gap:20px;height:64px}
-.logo{font-weight:900;font-size:1.5rem;text-decoration:none;letter-spacing:-.04em}
-.logo b{color:var(--accent)}
-.links{display:flex;gap:4px;margin-left:auto;align-items:center}
-.links a{font:700 .8rem var(--mono);text-transform:uppercase;text-decoration:none;padding:8px 10px;border:2px solid transparent}
-.links a:hover,.links a[aria-current="page"]{border-color:var(--ink)}
-.links .btn{padding:9px 14px;font-size:.8rem;margin-left:8px}
-.menu{display:none;margin-left:auto;font:800 .8rem var(--mono);background:var(--card);color:var(--ink);border:var(--line) solid var(--ink);padding:9px 12px}
-@media (max-width:860px){.menu{display:block}.links{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;background:var(--bg);border-bottom:var(--line) solid var(--ink);padding:12px var(--sp);margin:0}.links.open{display:flex}.links a{padding:14px 8px;border-bottom:2px solid var(--ink)}.links .btn{margin:12px 0 0;text-align:center}}
-.hero{border-top:0;padding-top:clamp(32px,6vw,72px)}
-.hero p.lead{font-size:clamp(1.1rem,2vw,1.4rem);max-width:44ch;margin:22px 0 28px}
-.stats{display:flex;flex-wrap:wrap;margin-top:clamp(28px,5vw,48px);border:var(--line) solid var(--ink);background:var(--ink);color:var(--bg)}
-.stats div{flex:1 1 160px;padding:14px 18px;border-right:2px solid var(--bg)}
-.stats div:last-child{border-right:0}
-.stats b{display:block;font:900 2rem/1 var(--mono);color:var(--accent)}
-.bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin:clamp(24px,4vw,40px) 0}
-.chip{font:800 .85rem var(--mono);text-transform:uppercase;padding:11px 15px;border:var(--line) solid var(--ink);background:var(--card);color:var(--ink);cursor:pointer;transition:background .15s,transform .15s}
-.chip:hover{transform:rotate(-1.5deg)}
-.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
-.search{margin-left:auto;font:700 .9rem var(--mono);padding:11px 14px;border:var(--line) solid var(--ink);background:var(--card);color:var(--ink);min-width:220px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sp)}
-.card{padding:22px;display:flex;flex-direction:column;gap:12px;transition:transform .15s,box-shadow .15s}
-.card:hover{transform:translate(-4px,-4px);box-shadow:var(--shadow)}
-.card .n{font:900 2.6rem/1 var(--mono);color:var(--accent);-webkit-text-stroke:2px var(--ink)}
-.card p{margin:0;color:var(--mute)}
-.meta{display:flex;flex-wrap:wrap;gap:8px}
-.meta span{border:2px solid var(--ink);padding:2px 8px}
-.card .more{border-top:2px solid var(--ink);padding-top:12px;margin-top:auto;display:flex;justify-content:space-between;gap:10px;align-items:center}
-.card ul{margin:0;padding-left:20px;color:var(--mute);font-size:.95rem}
-.card ul[hidden]{display:none}
-.card .btn{padding:10px 14px;font-size:.8rem}
-.empty{grid-column:1/-1;padding:28px;text-align:center}
-@media (max-width:960px){.grid{grid-template-columns:1fr 1fr}}
-@media (max-width:600px){.grid{grid-template-columns:1fr}.search{margin-left:0;width:100%}}
-.path{display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-top:clamp(28px,5vw,48px);box-shadow:var(--shadow)}
-.path div{padding:22px;border:var(--line) solid var(--ink);margin:0 -3px -3px 0;background:var(--card)}
-.path b{font:900 3rem/1 var(--mono);color:var(--accent);-webkit-text-stroke:2px var(--ink)}
-.path h3{margin:8px 0}
-.path p{margin:0;color:var(--mute)}
-@media (max-width:860px){.path{grid-template-columns:1fr 1fr}}
-@media (max-width:520px){.path{grid-template-columns:1fr}}
-.final{background:var(--accent);color:#0d0d0d}
-.final h2{max-width:14ch;font-size:clamp(2.6rem,8vw,6.5rem)}
-.final .btn{background:#0d0d0d;color:#f1eee6;border-color:#0d0d0d;box-shadow:5px 5px 0 #f1eee6;margin-top:28px}
-.final .btn:hover{box-shadow:8px 8px 0 #f1eee6}
-.final .tag{background:#0d0d0d;color:#f1eee6}
-footer{border-top:var(--line) solid var(--ink);padding:36px 0 48px}
-.foot{display:flex;flex-wrap:wrap;gap:24px;justify-content:space-between;align-items:end}
-.foot nav{height:auto;gap:18px;flex-wrap:wrap}
-.foot a{font:700 .8rem var(--mono);text-transform:uppercase}
-.rv{opacity:0;transform:translateY(18px);transition:opacity .5s,transform .5s}
-.rv.on{opacity:1;transform:none}
-@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto}.rv{opacity:1;transform:none}}
-</style>
-</head>
-<body>
-<header>
-  <div class="wrap">
-    <nav aria-label="Primary">
-      <a class="logo" href="index.html#top">TRACE<b>.</b></a>
-      <button class="menu" aria-expanded="false" aria-controls="links">MENU</button>
-      <div class="links" id="links">
-        <a href="index.html#top">Home</a>
-        <a href="courses.html" aria-current="page">Courses</a>
-        <a href="index.html#features">News</a>
-        <a href="index.html#interface">Software</a>
-        <a href="index.html#about">About Us</a>
-        <a class="btn" href="https://traceresponse.vercel.app">AI Chatbot</a>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+    <title>Courses — TRACE</title>
+    <link rel="icon" type="image/x-icon" href="/logo.png">
+    <meta name="description" content="TRACE courses: learn disaster-response mapping, rover operation and the TRACE software.">
+
+    <style>
+      :root {
+        --bg: #ece9e1;
+        --ink: #0d0d0d;
+        --card: #f7f5ef;
+        --accent: #ff4f00;
+        --mute: #5b5a55;
+        --line: 3px;
+        --sp: clamp(16px, 3vw, 32px);
+        --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+        --sans: "Helvetica Neue", Arial, system-ui, sans-serif;
+        --shadow: 6px 6px 0 var(--ink);
+        box-sizing: border-box;
+        padding-top: env(safe-area-inset-top, 0px);
+        padding-bottom: env(safe-area-inset-bottom, 0px);
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #111110;
+          --ink: #f1eee6;
+          --card: #1a1a18;
+          --mute: #a09e94;
+        }
+      }
+
+      :root[data-theme="dark"] {
+        --bg: #111110;
+        --ink: #f1eee6;
+        --card: #1a1a18;
+        --mute: #a09e94;
+      }
+
+      *, *::before, *::after {
+        box-sizing: inherit;
+      }
+
+      html {
+        scroll-behavior: smooth;
+        scroll-padding-top: calc(80px + env(safe-area-inset-top, 0px));
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 400 17px/1.5 var(--sans);
+        background-image:
+          linear-gradient(color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px),
+          linear-gradient(90deg, color-mix(in srgb, var(--ink) 7%, transparent) 1px, transparent 1px);
+        background-size: 40px 40px;
+      }
+
+      a {
+        color: inherit;
+      }
+
+      :focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+
+      .wrap {
+        max-width: 1180px;
+        margin: 0 auto;
+        padding: 0 var(--sp);
+      }
+
+      .mono {
+        font-family: var(--mono);
+        font-size: 0.78rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+
+      section {
+        padding: clamp(56px, 9vw, 110px) 0;
+        border-top: var(--line) solid var(--ink);
+      }
+
+      h1, h2, h3 {
+        margin: 0;
+        line-height: 0.95;
+        letter-spacing: -0.03em;
+        font-weight: 900;
+      }
+
+      h1 {
+        font-size: clamp(3.4rem, 12vw, 9rem);
+      }
+
+      h2 {
+        font-size: clamp(2.2rem, 6vw, 4.4rem);
+        max-width: 16ch;
+      }
+
+      h3 {
+        font-size: 1.4rem;
+        letter-spacing: -0.01em;
+      }
+
+      .tag {
+        display: inline-block;
+        background: var(--ink);
+        color: var(--bg);
+        padding: 3px 9px;
+        margin-bottom: 18px;
+      }
+
+      .box {
+        background: var(--card);
+        border: var(--line) solid var(--ink);
+        border-radius: 2px;
+      }
+
+      .btn {
+        display: inline-block;
+        font: 800 0.95rem var(--mono);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+        text-decoration: none;
+        padding: 14px 22px;
+        border: var(--line) solid var(--ink);
+        background: var(--accent);
+        color: #0d0d0d;
+        box-shadow: 4px 4px 0 var(--ink);
+        transition: transform 0.12s, box-shadow 0.12s;
+        cursor: pointer;
+      }
+
+      .btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 7px 7px 0 var(--ink);
+      }
+
+      .btn:active {
+        transform: translate(3px, 3px);
+        box-shadow: 1px 1px 0 var(--ink);
+      }
+
+      .btn.alt {
+        background: var(--card);
+        color: var(--ink);
+      }
+
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        background: var(--bg);
+        border-bottom: var(--line) solid var(--ink);
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+
+      nav {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        height: 64px;
+      }
+
+      .logo {
+        font-weight: 900;
+        font-size: 1.5rem;
+        text-decoration: none;
+        letter-spacing: -0.04em;
+      }
+
+      .logo b {
+        color: var(--accent);
+      }
+
+      .links {
+        display: flex;
+        gap: 4px;
+        margin-left: auto;
+        align-items: center;
+      }
+
+      .links a {
+        font: 700 0.8rem var(--mono);
+        text-transform: uppercase;
+        text-decoration: none;
+        padding: 8px 10px;
+        border: 2px solid transparent;
+      }
+
+      .links a:hover,
+      .links a[aria-current="page"] {
+        border-color: var(--ink);
+      }
+
+      .links .btn {
+        padding: 9px 14px;
+        font-size: 0.8rem;
+        margin-left: 8px;
+      }
+
+      .menu {
+        display: none;
+        margin-left: auto;
+        font: 800 0.8rem var(--mono);
+        background: var(--card);
+        color: var(--ink);
+        border: var(--line) solid var(--ink);
+        padding: 9px 12px;
+      }
+
+      @media (max-width: 860px) {
+        .menu {
+          display: block;
+        }
+
+        .links {
+          display: none;
+          position: absolute;
+          top: 100%;
+          left: 0;
+          right: 0;
+          flex-direction: column;
+          align-items: stretch;
+          background: var(--bg);
+          border-bottom: var(--line) solid var(--ink);
+          padding: 12px var(--sp);
+          margin: 0;
+        }
+
+        .links.open {
+          display: flex;
+        }
+
+        .links a {
+          padding: 14px 8px;
+          border-bottom: 2px solid var(--ink);
+        }
+
+        .links .btn {
+          margin: 12px 0 0;
+          text-align: center;
+        }
+      }
+
+      .hero {
+        border-top: 0;
+        padding-top: clamp(32px, 6vw, 72px);
+      }
+
+      .hero p.lead {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        max-width: 44ch;
+        margin: 22px 0 28px;
+      }
+
+      .stats {
+        display: flex;
+        flex-wrap: wrap;
+        margin-top: clamp(28px, 5vw, 48px);
+        border: var(--line) solid var(--ink);
+        background: var(--ink);
+        color: var(--bg);
+      }
+
+      .stats div {
+        flex: 1 1 160px;
+        padding: 14px 18px;
+        border-right: 2px solid var(--bg);
+      }
+
+      .stats div:last-child {
+        border-right: 0;
+      }
+
+      .stats b {
+        display: block;
+        font: 900 2rem/1 var(--mono);
+        color: var(--accent);
+      }
+
+      .bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+        align-items: center;
+        margin: clamp(24px, 4vw, 40px) 0;
+      }
+
+      .chip {
+        font: 800 0.85rem var(--mono);
+        text-transform: uppercase;
+        padding: 11px 15px;
+        border: var(--line) solid var(--ink);
+        background: var(--card);
+        color: var(--ink);
+        cursor: pointer;
+        transition: background 0.15s, transform 0.15s;
+      }
+
+      .chip:hover {
+        transform: rotate(-1.5deg);
+      }
+
+      .chip[aria-pressed="true"] {
+        background: var(--ink);
+        color: var(--bg);
+      }
+
+      .search {
+        margin-left: auto;
+        font: 700 0.9rem var(--mono);
+        padding: 11px 14px;
+        border: var(--line) solid var(--ink);
+        background: var(--card);
+        color: var(--ink);
+        min-width: 220px;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--sp);
+      }
+
+      .card {
+        padding: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        transition: transform 0.15s, box-shadow 0.15s;
+      }
+
+      .card:hover {
+        transform: translate(-4px, -4px);
+        box-shadow: var(--shadow);
+      }
+
+      .card .n {
+        font: 900 2.6rem/1 var(--mono);
+        color: var(--accent);
+        -webkit-text-stroke: 2px var(--ink);
+      }
+
+      .card p {
+        margin: 0;
+        color: var(--mute);
+      }
+
+      .meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .meta span {
+        border: 2px solid var(--ink);
+        padding: 2px 8px;
+      }
+
+      .card .more {
+        border-top: 2px solid var(--ink);
+        padding-top: 12px;
+        margin-top: auto;
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        align-items: center;
+      }
+
+      .card ul {
+        margin: 0;
+        padding-left: 20px;
+        color: var(--mute);
+        font-size: 0.95rem;
+      }
+
+      .card ul[hidden] {
+        display: none;
+      }
+
+      .card .btn {
+        padding: 10px 14px;
+        font-size: 0.8rem;
+      }
+
+      .empty {
+        grid-column: 1 / -1;
+        padding: 28px;
+        text-align: center;
+      }
+
+      @media (max-width: 960px) {
+        .grid {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 600px) {
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .search {
+          margin-left: 0;
+          width: 100%;
+        }
+      }
+
+      .path {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0;
+        margin-top: clamp(28px, 5vw, 48px);
+        box-shadow: var(--shadow);
+      }
+
+      .path div {
+        padding: 22px;
+        border: var(--line) solid var(--ink);
+        margin: 0 -3px -3px 0;
+        background: var(--card);
+      }
+
+      .path b {
+        font: 900 3rem/1 var(--mono);
+        color: var(--accent);
+        -webkit-text-stroke: 2px var(--ink);
+      }
+
+      .path h3 {
+        margin: 8px 0;
+      }
+
+      .path p {
+        margin: 0;
+        color: var(--mute);
+      }
+
+      @media (max-width: 860px) {
+        .path {
+          grid-template-columns: 1fr 1fr;
+        }
+      }
+
+      @media (max-width: 520px) {
+        .path {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .final {
+        background: var(--accent);
+        color: #0d0d0d;
+      }
+
+      .final h2 {
+        max-width: 14ch;
+        font-size: clamp(2.6rem, 8vw, 6.5rem);
+      }
+
+      .final .btn {
+        background: #0d0d0d;
+        color: #f1eee6;
+        border-color: #0d0d0d;
+        box-shadow: 5px 5px 0 #f1eee6;
+        margin-top: 28px;
+      }
+
+      .final .btn:hover {
+        box-shadow: 8px 8px 0 #f1eee6;
+      }
+
+      .final .tag {
+        background: #0d0d0d;
+        color: #f1eee6;
+      }
+
+      footer {
+        border-top: var(--line) solid var(--ink);
+        padding: 36px 0 48px;
+      }
+
+      .foot {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 24px;
+        justify-content: space-between;
+        align-items: end;
+      }
+
+      .foot nav {
+        height: auto;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+
+      .foot a {
+        font: 700 0.8rem var(--mono);
+        text-transform: uppercase;
+      }
+
+      .rv {
+        opacity: 0;
+        transform: translateY(18px);
+        transition: opacity 0.5s, transform 0.5s;
+      }
+
+      .rv.on {
+        opacity: 1;
+        transform: none;
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto;
+        }
+
+        .rv {
+          opacity: 1;
+          transform: none;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="wrap">
+        <nav aria-label="Primary">
+          <a class="logo" href="index.html#top">TRACE<b>.</b></a>
+          <button class="menu" aria-expanded="false" aria-controls="links">MENU</button>
+          <div class="links" id="links">
+            <a href="index.html#top">Home</a>
+            <a href="courses.html" aria-current="page">Courses</a>
+            <a href="news.html">News</a>
+            <a href="index.html#interface">Software</a>
+            <a href="about.html">About Us</a>
+            <a class="btn" href="https://traceresponse.vercel.app">AI Chatbot</a>
+          </div>
+        </nav>
       </div>
-    </nav>
-  </div>
-</header>
+    </header>
 
-<main id="top">
-  <section class="hero">
-    <div class="wrap">
-      <span class="tag mono">SYS.02 // TRAINING</span>
-      <h1>COURSES</h1>
-      <p class="lead">Learn how disaster zones get mapped, from reading a TRACE map to running the rovers behind it.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:14px">
-        <a class="btn" href="#catalog">Browse courses</a>
-        <a class="btn alt" href="#path">See learning path</a>
+    <main id="top">
+      <section class="hero">
+        <div class="wrap">
+          <span class="tag mono">SYS.02 // TRAINING</span>
+          <h1>COURSES</h1>
+          <p class="lead">
+            Learn how disaster zones get mapped, from reading a TRACE map to running the rovers behind it.
+          </p>
+
+          <div style="display: flex; flex-wrap: wrap; gap: 14px;">
+            <a class="btn" href="#catalog">Browse courses</a>
+            <a class="btn alt" href="#path">See learning path</a>
+          </div>
+
+          <div class="stats mono" aria-label="Course summary">
+            <div><b id="sCount">0</b>Courses</div>
+            <div><b>3</b>Levels</div>
+            <div><b>3</b>Audiences</div>
+          </div>
+        </div>
+      </section>
+
+      <section id="catalog">
+        <div class="wrap">
+          <span class="tag mono">01 // Catalog</span>
+          <h2 class="rv">Pick a course. Start today.</h2>
+
+          <div class="bar" role="group" aria-label="Filter courses">
+            <button class="chip" data-f="All" aria-pressed="true">All</button>
+            <button class="chip" data-f="Civilians" aria-pressed="false">Civilians</button>
+            <button class="chip" data-f="Responders" aria-pressed="false">Responders</button>
+            <button class="chip" data-f="Builders" aria-pressed="false">Builders</button>
+            <input class="search" id="q" type="search" placeholder="SEARCH COURSES" aria-label="Search courses">
+          </div>
+
+          <div class="grid" id="grid" aria-live="polite"></div>
+        </div>
+      </section>
+
+      <section id="path">
+        <div class="wrap">
+          <span class="tag mono">02 // Learning path</span>
+          <h2 class="rv">From first map to field work.</h2>
+
+          <div class="path rv">
+            <div>
+              <b>01</b>
+              <h3>Understand</h3>
+              <p>Learn what the platform shows and how to read it.</p>
+            </div>
+            <div>
+              <b>02</b>
+              <h3>Interpret</h3>
+              <p>Turn terrain data and hazard flags into decisions.</p>
+            </div>
+            <div>
+              <b>03</b>
+              <h3>Operate</h3>
+              <p>Plan rover runs and use the software to fuse data.</p>
+            </div>
+            <div>
+              <b>04</b>
+              <h3>Build</h3>
+              <p>Assemble low-cost mapping hardware of your own.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="final">
+        <div class="wrap">
+          <span class="tag mono">03 // Get started</span>
+          <h2>Know before you go in.</h2>
+          <a class="btn" href="https://traceresponse.vercel.app">Ask the AI chatbot →</a>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap foot">
+        <div>
+          <a class="logo" href="index.html#top">TRACE<b>.</b></a>
+          <p class="mono" style="margin: 8px 0 0; color: var(--mute);">
+            Tactical Reconnaissance and Assessment for Critical Environments
+          </p>
+        </div>
+
+        <nav aria-label="Footer">
+          <a href="index.html#top">Home</a>
+          <a href="courses.html">Courses</a>
+          <a href="index.html#features">News</a>
+          <a href="index.html#interface">Software</a>
+          <a href="index.html#about">About Us</a>
+        </nav>
       </div>
-      <div class="stats mono" aria-label="Course summary">
-        <div><b id="sCount">0</b>Courses</div>
-        <div><b>3</b>Levels</div>
-        <div><b>3</b>Audiences</div>
-      </div>
-    </div>
-  </section>
+    </footer>
 
-  <section id="catalog">
-    <div class="wrap">
-      <span class="tag mono">01 // Catalog</span>
-      <h2 class="rv">Pick a course. Start today.</h2>
-      <div class="bar" role="group" aria-label="Filter courses">
-        <button class="chip" data-f="All" aria-pressed="true">All</button>
-        <button class="chip" data-f="Civilians" aria-pressed="false">Civilians</button>
-        <button class="chip" data-f="Responders" aria-pressed="false">Responders</button>
-        <button class="chip" data-f="Builders" aria-pressed="false">Builders</button>
-        <input class="search" id="q" type="search" placeholder="SEARCH COURSES" aria-label="Search courses">
-      </div>
-      <div class="grid" id="grid" aria-live="polite"></div>
-    </div>
-  </section>
+    <script>
+      const menu = document.querySelector('.menu');
+      const links = document.getElementById('links');
 
-  <section id="path">
-    <div class="wrap">
-      <span class="tag mono">02 // Learning path</span>
-      <h2 class="rv">From first map to field work.</h2>
-      <div class="path rv">
-        <div><b>01</b><h3>Understand</h3><p>Learn what the platform shows and how to read it.</p></div>
-        <div><b>02</b><h3>Interpret</h3><p>Turn terrain data and hazard flags into decisions.</p></div>
-        <div><b>03</b><h3>Operate</h3><p>Plan rover runs and use the software to fuse data.</p></div>
-        <div><b>04</b><h3>Build</h3><p>Assemble low-cost mapping hardware of your own.</p></div>
-      </div>
-    </div>
-  </section>
+      menu.onclick = () => {
+        const isOpen = links.classList.toggle('open');
+        menu.setAttribute('aria-expanded', isOpen);
+      };
 
-  <section class="final">
-    <div class="wrap">
-      <span class="tag mono">03 // Get started</span>
-      <h2>Know before you go in.</h2>
-      <a class="btn" href="https://traceresponse.vercel.app">Ask the AI chatbot →</a>
-    </div>
-  </section>
-</main>
+      links.addEventListener('click', (event) => {
+        if (event.target.tagName === 'A') {
+          links.classList.remove('open');
+          menu.setAttribute('aria-expanded', false);
+        }
+      });
 
-<footer>
-  <div class="wrap foot">
-    <div>
-      <a class="logo" href="index.html#top">TRACE<b>.</b></a>
-      <p class="mono" style="margin:8px 0 0;color:var(--mute)">Tactical Reconnaissance and Assessment for Critical Environments</p>
-    </div>
-    <nav aria-label="Footer">
-      <a href="index.html#top">Home</a>
-      <a href="courses.html">Courses</a>
-      <a href="index.html#features">News</a>
-      <a href="index.html#interface">Software</a>
-      <a href="index.html#about">About Us</a>
-    </nav>
-  </div>
-</footer>
+      const io = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add('on');
+              io.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.15 }
+      );
 
-<script>
-const menu=document.querySelector('.menu'),links=document.getElementById('links');
-menu.onclick=()=>{const o=links.classList.toggle('open');menu.setAttribute('aria-expanded',o)};
-links.addEventListener('click',e=>{if(e.target.tagName==='A'){links.classList.remove('open');menu.setAttribute('aria-expanded',false)}});
+      document.querySelectorAll('.rv').forEach((element) => io.observe(element));
 
-const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');io.unobserve(e.target)}}),{threshold:.15});
-document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+      const COURSES = [
+        {
+          t: 'Reading a TRACE map',
+          a: 'Civilians',
+          l: 'Beginner',
+          d: '2 hrs',
+          s: 'How to read scanned areas, hazard flags and live updates on the platform.',
+          m: ['What the map shows', 'Scanned vs hazard zones', 'Reading live updates', 'Staying safe with the data']
+        },
+        {
+          t: 'Disaster awareness basics',
+          a: 'Civilians',
+          l: 'Beginner',
+          d: '3 hrs',
+          s: 'Understand common disaster types and how remote mapping supports response.',
+          m: ['Disaster types', 'Why recon matters', 'Using online updates', 'Family preparedness']
+        },
+        {
+          t: 'Situational data for responders',
+          a: 'Responders',
+          l: 'Intermediate',
+          d: '4 hrs',
+          s: 'Turn terrain conditions and rover data into field decisions.',
+          m: ['Terrain condition metrics', 'Prioritising hazards', 'Sharing maps with teams', 'Case walkthroughs']
+        },
+        {
+          t: 'Rover operations',
+          a: 'Responders',
+          l: 'Advanced',
+          d: '6 hrs',
+          s: 'Plan and run rover deployments in inaccessible areas.',
+          m: ['Deployment planning', 'Remote control basics', 'Sensor and camera checks', 'Recovery procedures']
+        },
+        {
+          t: 'TRACE software workshop',
+          a: 'Builders',
+          l: 'Intermediate',
+          d: '5 hrs',
+          s: 'Install the custom software and fuse rover data into one picture.',
+          m: ['Install and setup', 'Importing rover data', 'Merging sensor streams', 'Publishing to the platform']
+        },
+        {
+          t: 'Build a low-cost mapper',
+          a: 'Builders',
+          l: 'Advanced',
+          d: '8 hrs',
+          s: 'Assemble affordable mapping hardware with sensors and cameras.',
+          m: ['Parts and budget', 'Sensor wiring', 'Calibration', 'Field testing']
+        }
+      ];
 
-// Edit this array to change the catalog.
-const COURSES=[
- {t:'Reading a TRACE map',a:'Civilians',l:'Beginner',d:'2 hrs',s:'How to read scanned areas, hazard flags and live updates on the platform.',m:['What the map shows','Scanned vs hazard zones','Reading live updates','Staying safe with the data']},
- {t:'Disaster awareness basics',a:'Civilians',l:'Beginner',d:'3 hrs',s:'Understand common disaster types and how remote mapping supports response.',m:['Disaster types','Why recon matters','Using online updates','Family preparedness']},
- {t:'Situational data for responders',a:'Responders',l:'Intermediate',d:'4 hrs',s:'Turn terrain conditions and rover data into field decisions.',m:['Terrain condition metrics','Prioritising hazards','Sharing maps with teams','Case walkthroughs']},
- {t:'Rover operations',a:'Responders',l:'Advanced',d:'6 hrs',s:'Plan and run rover deployments in inaccessible areas.',m:['Deployment planning','Remote control basics','Sensor and camera checks','Recovery procedures']},
- {t:'TRACE software workshop',a:'Builders',l:'Intermediate',d:'5 hrs',s:'Install the custom software and fuse rover data into one picture.',m:['Install and setup','Importing rover data','Merging sensor streams','Publishing to the platform']},
- {t:'Build a low-cost mapper',a:'Builders',l:'Advanced',d:'8 hrs',s:'Assemble affordable mapping hardware with sensors and cameras.',m:['Parts and budget','Sensor wiring','Calibration','Field testing']}
-];
-const grid=document.getElementById('grid'),q=document.getElementById('q');
-let filter='All';
-document.getElementById('sCount').textContent=COURSES.length;
+      const grid = document.getElementById('grid');
+      const q = document.getElementById('q');
+      let filter = 'All';
 
-function render(){
-  const term=q.value.trim().toLowerCase();
-  const list=COURSES.map((c,i)=>({...c,i})).filter(c=>(filter==='All'||c.a===filter)&&(!term||(c.t+' '+c.s).toLowerCase().includes(term)));
-  grid.innerHTML='';
-  if(!list.length){grid.innerHTML='<div class="box empty mono">No courses match. Clear the search or pick another audience.</div>';return}
-  list.forEach(c=>{
-    const el=document.createElement('article');
-    el.className='box card';
-    el.innerHTML=`<span class="n">${String(c.i+1).padStart(2,'0')}</span><h3>${c.t}</h3><p>${c.s}</p>
-    <div class="meta mono"><span>${c.a}</span><span>${c.l}</span><span>${c.d}</span></div>
-    <ul id="m${c.i}" hidden>${c.m.map(x=>`<li>${x}</li>`).join('')}</ul>
-    <div class="more"><button class="chip" aria-expanded="false" aria-controls="m${c.i}">Syllabus</button><a class="btn" href="https://traceresponse.vercel.app">Enroll</a></div>`;
-    const b=el.querySelector('.chip'),u=el.querySelector('ul');
-    b.onclick=()=>{const open=u.hidden;u.hidden=!open;b.setAttribute('aria-expanded',open)};
-    grid.appendChild(el);
-  });
-}
-document.querySelectorAll('.bar .chip').forEach(b=>b.onclick=()=>{
-  filter=b.dataset.f;
-  document.querySelectorAll('.bar .chip').forEach(x=>x.setAttribute('aria-pressed',x===b));
-  render();
-});
-q.oninput=render;
-render();
-</script>
-</body>
+      document.getElementById('sCount').textContent = COURSES.length;
+
+      function render() {
+        const term = q.value.trim().toLowerCase();
+        const list = COURSES.map((course, index) => ({ ...course, index }))
+          .filter((course) => (filter === 'All' || course.a === filter) && (!term || (course.t + ' ' + course.s).toLowerCase().includes(term)));
+
+        grid.innerHTML = '';
+
+        if (!list.length) {
+          grid.innerHTML = '<div class="box empty mono">No courses match. Clear the search or pick another audience.</div>';
+          return;
+        }
+
+        list.forEach((course) => {
+          const element = document.createElement('article');
+          element.className = 'box card';
+          element.innerHTML = `
+            <span class="n">${String(course.index + 1).padStart(2, '0')}</span>
+            <h3>${course.t}</h3>
+            <p>${course.s}</p>
+            <div class="meta mono">
+              <span>${course.a}</span>
+              <span>${course.l}</span>
+              <span>${course.d}</span>
+            </div>
+            <ul id="m${course.index}" hidden>${course.m.map((item) => `<li>${item}</li>`).join('')}</ul>
+            <div class="more">
+              <button class="chip" aria-expanded="false" aria-controls="m${course.index}">Syllabus</button>
+              <a class="btn" href="https://traceresponse.vercel.app">Enroll</a>
+            </div>
+          `;
+
+          const button = element.querySelector('.chip');
+          const listElement = element.querySelector('ul');
+
+          button.onclick = () => {
+            const isOpen = listElement.hidden;
+            listElement.hidden = !isOpen;
+            button.setAttribute('aria-expanded', isOpen);
+          };
+
+          grid.appendChild(element);
+        });
+      }
+
+      document.querySelectorAll('.bar .chip').forEach((button) => {
+        button.onclick = () => {
+          filter = button.dataset.f;
+          document.querySelectorAll('.bar .chip').forEach((chip) => chip.setAttribute('aria-pressed', chip === button));
+          render();
+        };
+      });
+
+      q.oninput = render;
+      render();
+    </script>
+  </body>
 </html>
