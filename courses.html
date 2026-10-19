@@ -670,18 +670,18 @@
       </section>
     </main>
 
-    <dialog class="course-dialog" id="fireDialog" aria-labelledby="fireDialogTitle">
+    <dialog class="course-dialog" id="courseDialog" aria-labelledby="courseDialogTitle">
       <div class="dialog-content">
         <div class="dialog-heading">
           <div>
-            <span class="tag mono">COURSE // FIRE SAFETY</span>
-            <h2 id="fireDialogTitle">How to survive a fire</h2>
+            <span class="tag mono" id="courseDialogLabel">COURSE // FIRE SAFETY</span>
+            <h2 id="courseDialogTitle">How to survive a fire</h2>
           </div>
           <button class="dialog-close" type="button" aria-label="Close course">×</button>
         </div>
         <p class="video-instructions" id="videoInstructions">Watch the video to the end to unlock your certificate.</p>
-        <video class="course-video" id="fireVideo" controls preload="metadata" playsinline>
-          <source src="course-vid/fire.mp4" type="video/mp4">
+        <video class="course-video" id="courseVideo" controls preload="metadata" playsinline>
+          <source id="courseVideoSource" src="course-vid/fire.mp4" type="video/mp4">
           Your browser does not support HTML video.
         </video>
         <form class="certificate-form" id="certificateForm" hidden>
@@ -771,6 +771,11 @@
           t: 'Earthquake',
           a: 'Disaster',
           s: 'How to survive an earthquake, from preparing to staying safe afterwards.',
+          video: 'quake',
+          certificate: 'cert-quake.jpg',
+          certificatePrefix: 'quake',
+          courseLabel: 'EARTHQUAKE SAFETY',
+          courseTitle: 'How to survive an earthquake',
           learn: [
             'How to get your home and family ready',
             'How to protect yourself when the ground shakes',
@@ -782,6 +787,11 @@
           t: 'Fires',
           a: 'Disaster',
           s: 'How to survive a fire and get out safely.',
+          video: 'fire',
+          certificate: 'cert-fire.jpg',
+          certificatePrefix: 'fire',
+          courseLabel: 'FIRE SAFETY',
+          courseTitle: 'How to survive a fire',
           learn: [
             'How to prepare an escape plan',
             'How to get out fast and stay low in smoke',
@@ -793,6 +803,11 @@
           t: 'Floods',
           a: 'Disaster',
           s: 'How to survive a flood and protect your family when the water rises.',
+          video: 'flood',
+          certificate: 'cert-flood.jpg',
+          certificatePrefix: 'flood',
+          courseLabel: 'FLOOD SAFETY',
+          courseTitle: 'How to survive a flood',
           learn: [
             'How to prepare before a flood warning',
             'How to move to safety when water rises',
@@ -804,14 +819,18 @@
 
       const grid = document.getElementById('grid');
       const q = document.getElementById('q');
-      const fireDialog = document.getElementById('fireDialog');
-      const fireVideo = document.getElementById('fireVideo');
+      const courseDialog = document.getElementById('courseDialog');
+      const courseDialogLabel = document.getElementById('courseDialogLabel');
+      const courseDialogTitle = document.getElementById('courseDialogTitle');
+      const courseVideo = document.getElementById('courseVideo');
+      const courseVideoSource = document.getElementById('courseVideoSource');
       const certificateForm = document.getElementById('certificateForm');
       const certificateName = document.getElementById('certificateName');
       const certificateDownload = document.getElementById('certificateDownload');
       const videoInstructions = document.getElementById('videoInstructions');
       const dialogStatus = document.getElementById('dialogStatus');
       let certificateUrl = '';
+      let activeCourse = null;
       let filter = 'All';
 
       document.getElementById('sCount').textContent = COURSES.length;
@@ -847,7 +866,7 @@
             </div>
             <div class="more">
               <button class="chip" aria-expanded="false" aria-controls="m${course.index}">What you'll learn</button>
-              ${course.t === 'Fires' ? '<button class="btn start-course" type="button">Start</button>' : ''}
+              ${course.video ? '<button class="btn start-course" type="button">Start</button>' : ''}
             </div>
           `;
 
@@ -863,8 +882,10 @@
           const startButton = element.querySelector('.start-course');
           if (startButton) {
             startButton.onclick = () => {
-              resetFireCourse();
-              fireDialog.showModal();
+              resetCourse(course);
+              courseDialogLabel.textContent = `COURSE // ${course.courseLabel}`;
+              courseDialogTitle.textContent = course.courseTitle;
+              courseDialog.showModal();
             };
           }
 
@@ -872,10 +893,15 @@
         });
       }
 
-      function resetFireCourse() {
-        fireVideo.pause();
-        fireVideo.currentTime = 0;
-        fireVideo.hidden = false;
+      function resetCourse(course = null) {
+        courseVideo.pause();
+        courseVideo.currentTime = 0;
+        activeCourse = course;
+        if (activeCourse) {
+          courseVideoSource.src = `course-vid/${activeCourse.video}.mp4`;
+          courseVideo.load();
+        }
+        courseVideo.hidden = false;
         certificateForm.hidden = true;
         certificateForm.reset();
         certificateName.value = '';
@@ -889,8 +915,8 @@
         }
       }
 
-      fireVideo.addEventListener('ended', () => {
-        fireVideo.hidden = true;
+      courseVideo.addEventListener('ended', () => {
+        courseVideo.hidden = true;
         videoInstructions.hidden = true;
         certificateForm.hidden = false;
         certificateName.focus();
@@ -911,7 +937,7 @@
 
         try {
           const image = new Image();
-          image.src = 'cert/cert-fire.jpg';
+          image.src = `cert/${activeCourse.certificate}`;
           await image.decode();
           const imperialScriptFaces = await document.fonts.load('300px "Imperial Script"');
           if (!imperialScriptFaces.length) {
@@ -948,7 +974,7 @@
           certificateUrl = URL.createObjectURL(blob);
           const filename = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'learner';
           certificateDownload.href = certificateUrl;
-          certificateDownload.download = `fire-certificate-${filename}.png`;
+          certificateDownload.download = `${activeCourse.certificatePrefix}-certificate-${filename}.png`;
           certificateDownload.hidden = false;
           dialogStatus.textContent = 'Your named certificate is ready to download.';
         } catch (error) {
@@ -957,8 +983,8 @@
         }
       });
 
-      fireDialog.querySelector('.dialog-close').addEventListener('click', () => fireDialog.close());
-      fireDialog.addEventListener('close', resetFireCourse);
+      courseDialog.querySelector('.dialog-close').addEventListener('click', () => courseDialog.close());
+      courseDialog.addEventListener('close', () => resetCourse());
 
       document.querySelectorAll('.bar .chip').forEach((button) => {
         button.onclick = () => {

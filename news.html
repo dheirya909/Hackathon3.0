@@ -87,6 +87,11 @@
       .meta { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
       .pill { border: 2px solid var(--ink); padding: 2px 8px; }
       .pill.rv { background: var(--accent); color: #0d0d0d; }
+      .sensor-summary { padding: 32px 0 8px; }
+      .sensor-summary h2 { margin: 0 0 8px; font-size: clamp(1.6rem, 4vw, 2.4rem); }
+      .sensor-summary > .wrap > p { margin: 0 0 20px; color: var(--mute); }
+      .sensor-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--sp); }
+      .sensor-card { min-width: 0; }
       .post p { margin: 0; color: var(--mute); }
       .post .body { color: var(--ink); }
       .details { margin: 4px 0 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); border: 2px solid var(--ink); }
@@ -102,7 +107,7 @@
       .state.err { background: var(--accent); color: #0d0d0d; }
       .skel { min-height: 160px; background: linear-gradient(90deg, var(--card) 0%, color-mix(in srgb, var(--ink) 8%, var(--card)) 50%, var(--card) 100%); background-size: 200% 100%; animation: sh 1.2s linear infinite; }
       @keyframes sh { to { background-position: -200% 0; } }
-      @media (max-width: 860px) { .feed { grid-template-columns: 1fr; } }
+      @media (max-width: 860px) { .feed, .sensor-grid { grid-template-columns: 1fr; } }
 
       footer { border-top: var(--line) solid var(--ink); padding: 36px 0 48px; }
       .foot { display: flex; flex-wrap: wrap; gap: 24px; justify-content: space-between; align-items: end; }
@@ -145,6 +150,14 @@
             <span id="count">0 updates</span>
             <span id="last">Last: --</span>
           </div>
+        </div>
+      </section>
+
+      <section class="sensor-summary" aria-labelledby="sensorSummaryTitle">
+        <div class="wrap">
+          <h2 id="sensorSummaryTitle">Average hazard readings</h2>
+          <p class="mono">Simulated random values for demonstration — not live sensor data.</p>
+          <div class="sensor-grid" id="sensorCards"></div>
         </div>
       </section>
 
@@ -197,6 +210,32 @@
       const $ = (id) => document.getElementById(id);
       const feed = $("feed"), filtersEl = $("filters");
       let items = [], active = "All";
+
+      function randomInRange(min, max, decimals = 1) {
+        return (Math.random() * (max - min) + min).toFixed(decimals);
+      }
+
+      const sensorReadings = [
+        { title: "Fire", temperature: randomInRange(26, 55), humidity: randomInRange(25, 65), smoke: randomInRange(10, 150) },
+        { title: "Earthquake", temperature: randomInRange(18, 30), humidity: randomInRange(30, 70), smoke: randomInRange(0, 30) }
+      ];
+
+      $("sensorCards").replaceChildren(...sensorReadings.map((reading) => {
+        const article = el("article", "box post sensor-card");
+        article.append(el("h3", "", reading.title));
+        const details = el("dl", "details");
+        [
+          ["Average temp", `${reading.temperature} °C`],
+          ["Average humidity", `${reading.humidity}%`],
+          ["Average smoke", `${reading.smoke} ppm`]
+        ].forEach(([label, value]) => {
+          const cell = el("div");
+          cell.append(el("dt", "", label), el("dd", "", value));
+          details.append(cell);
+        });
+        article.append(details);
+        return article;
+      }));
 
       const menu = document.querySelector(".menu"), links = $("links");
       menu.onclick = () => menu.setAttribute("aria-expanded", links.classList.toggle("open"));
