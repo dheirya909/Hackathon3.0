@@ -749,6 +749,9 @@
           t: 'Responder\'s Guide',
           a: 'Guide',
           s: 'How to download and use our software.',
+          video: 'response',
+          courseLabel: 'RESPONDER\'S GUIDE',
+          courseTitle: 'How to use TRACE as a responder',
           learn: [
             'How to download the TRACE software',
             'How to install and open it',
@@ -760,6 +763,9 @@
           t: 'Civilian\'s Guide',
           a: 'Guide',
           s: 'How to use our website and AI chatbot.',
+          video: 'civilian',
+          courseLabel: 'CIVILIAN\'S GUIDE',
+          courseTitle: 'How to use TRACE as a civilian',
           learn: [
             'How to find your way around the website',
             'How to check live disaster updates',
@@ -900,6 +906,9 @@
         if (activeCourse) {
           courseVideoSource.src = `course-vid/${activeCourse.video}.mp4`;
           courseVideo.load();
+          videoInstructions.textContent = activeCourse.certificate
+            ? 'Watch the video to the end to unlock your certificate.'
+            : 'Watch the video to the end to complete this guide.';
         }
         courseVideo.hidden = false;
         certificateForm.hidden = true;
@@ -918,9 +927,13 @@
       courseVideo.addEventListener('ended', () => {
         courseVideo.hidden = true;
         videoInstructions.hidden = true;
-        certificateForm.hidden = false;
-        certificateName.focus();
-        dialogStatus.textContent = 'Video complete. Add your name to create your certificate.';
+        if (activeCourse.certificate) {
+          certificateForm.hidden = false;
+          certificateName.focus();
+          dialogStatus.textContent = 'Video complete. Add your name to create your certificate.';
+        } else {
+          dialogStatus.textContent = 'Video complete. This guide does not include a certificate.';
+        }
       });
 
       certificateName.addEventListener('input', () => certificateName.setCustomValidity(''));
