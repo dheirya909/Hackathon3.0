@@ -191,7 +191,6 @@
       import { getAnalytics, isSupported } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-analytics.js";
       import { getFirestore, collection, query, orderBy, limit, onSnapshot } from "https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore.js";
 
-      /* ========= 1. FIREBASE CONFIG ========= */
       const firebaseConfig = {
         apiKey: "AIzaSyDOt9kRnJpmBcYJW0LzUfB5wtXBFQa98pA",
         authDomain: "trace-b38df.firebaseapp.com",
@@ -201,11 +200,7 @@
         appId: "1:27091131691:web:4783102290bee13d50b96e",
         measurementId: "G-93XR6BE3S9"
       };
-      /* ========= 2. COLLECTION NAME ========= */
       const COLLECTION = "news";
-      /* Expected doc fields (all optional except title):
-         title, summary, body, category, rover ("R1"/"R2"), date (Timestamp),
-         battery (number 0-100), terrain (string), area (string) */
 
       const $ = (id) => document.getElementById(id);
       const feed = $("feed"), filtersEl = $("filters");
@@ -246,7 +241,7 @@
         }
       });
 
-      /* Partial mask for sensitive-looking values (e.g. "Sector 4B" -> "Se█████ ██") */
+      /* Thoda mask laga do taaki sensitive-looking values seedhe na dikhein. */
       const mask = (v) => {
         const s = String(v);
         return s.slice(0, 2) + s.slice(2).replace(/[^\s]/g, "█");

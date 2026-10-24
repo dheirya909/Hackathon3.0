@@ -164,7 +164,7 @@
               <span class="mono">TRACE Software <span class="badge">Latest</span></span>
               <div class="ver" id="ver">v1.2.4</div>
               <p>The current stable version. Download it, install it, and connect it to your rover data.</p>
-              <a class="btn" id="dlbtn" href="downloads/trace-software-1.2.4.zip" download>Download v1.2.4 ↓</a>
+              <a class="btn" id="dlbtn" href="NEW.zip" download="NEW.zip">Download v1.2.4 ↓</a>
               <p class="note mono" id="status" role="status"></p>
             </div>
             <div class="meta rv" aria-label="Release details">
@@ -192,7 +192,7 @@
         <div class="wrap">
           <span class="tag mono">03 // Ready</span>
           <h2>Know before you go in.</h2>
-          <a class="btn" href="#download">Download v1.2.4 ↑</a>
+          <a class="btn" id="finalDlBtn" href="NEW.zip" download="NEW.zip">Download v1.2.4 ↑</a>
         </div>
       </section>
     </main>
@@ -215,16 +215,19 @@
     </footer>
 
     <script>
-      // Update these two values when you ship a new release.
       const VERSION = '1.2.4';
-      const FILE = 'downloads/trace-software-' + VERSION + '.zip';
+      const FILE = 'NEW.zip';
 
       document.getElementById('ver').textContent = 'v' + VERSION;
       document.getElementById('ver2').textContent = VERSION;
       const btn = document.getElementById('dlbtn');
       btn.href = FILE;
+      btn.download = FILE;
       btn.textContent = 'Download v' + VERSION + ' ↓';
-      document.querySelector('.final .btn').textContent = 'Download v' + VERSION + ' ↑';
+      const finalDownload = document.getElementById('finalDlBtn');
+      finalDownload.href = FILE;
+      finalDownload.download = FILE;
+      finalDownload.textContent = 'Download v' + VERSION + ' ↑';
       btn.addEventListener('click', () => {
         document.getElementById('status').textContent = 'Download started: v' + VERSION;
       });
